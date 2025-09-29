@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 import discord
 from dotenv import load_dotenv
@@ -19,8 +20,11 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content.startswith("$hello"):
-        await message.channel.send("Hello!")
+    if message.content.startswith("echo"):
+        print("Recieved:", message.content.split())
+        await message.channel.send(
+            subprocess.check_output(message.content.split()).decode("utf-8").strip()
+        )
 
 
 if __name__ == "__main__":
