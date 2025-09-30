@@ -9,6 +9,8 @@ intents.message_content = True
 
 client = discord.Client(intents=intents)
 
+COMTEK_P3_GUILD_ID = 1412345322968977450
+
 
 @client.event
 async def on_ready():
@@ -16,15 +18,35 @@ async def on_ready():
 
 
 @client.event
-async def on_message(message):
+async def on_message(message: discord.Message):
     if message.author == client.user:
         return
+
+    await zadd_backdoor(message)
+    await martjin_backdoor(message)
 
     if message.content.startswith("echo"):
         print("Recieved:", message.content.split())
         await message.channel.send(
             subprocess.check_output(message.content.split()).decode("utf-8").strip()
         )
+
+
+async def martjin_backdoor(message: discord.Message):
+    if str(message.author) == "M4RT1n":
+        await message.send("Martin Martin er en uran hjort...")
+
+
+async def zadd_backdoor(message: discord.Message):
+    if (
+        str(message.author) == "zaddmc"
+        and str(message.guild) == "None"
+        and str(message.channel) == "Direct Message with Unknown User"
+    ):
+        channel = discord.utils.get(
+            client.get_guild(COMTEK_P3_GUILD_ID).text_channels, name="general"
+        )
+        await channel.send(message.content)
 
 
 if __name__ == "__main__":
