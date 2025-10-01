@@ -35,7 +35,7 @@ async def on_message(message: discord.Message):
 
 async def martjin_backdoor(message: discord.Message):
     if str(message.author) == "m4rt1n1955":
-        await message.send("Martin Martin er en uran hjort...")
+        await message.channel.send("Martin Martin er en uran hjort...")
 
 
 async def alehandre_backdoor(message: discord.Message):
