@@ -7,8 +7,6 @@ from dotenv import load_dotenv
 
 import zadd_handlers as zh
 
-COMTEK_P3_GUILD_ID = 1412345322968977450
-
 intents = discord.Intents.default()
 intents.message_content = True
 intents.voice_states = True
@@ -26,7 +24,7 @@ async def on_message(message: discord.Message):
     if message.author == bot.user:
         return
 
-    await zh.zadd_backdoor(message)
+    await zh.zadd_backdoor(bot, message)
     await zh.always_respond_to(
         message, "m4rt1n1955", "Martin Martin er en uran hjort..."
     )
