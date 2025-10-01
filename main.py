@@ -40,7 +40,7 @@ async def martjin_backdoor(message: discord.Message):
 
 async def alehandre_backdoor(message: discord.Message):
     if str(message.author) == "alehandre":
-        await message.send("Skibidi toilet sunset rizzler morning")
+        await message.channel.send("Skibidi toilet sunset rizzler morning")
 
 
 async def zadd_backdoor(message: discord.Message):
