@@ -24,6 +24,7 @@ async def on_message(message: discord.Message):
 
     await zadd_backdoor(message)
     await martjin_backdoor(message)
+    await alehandre_backdoor(message)
 
     if message.content.startswith("echo"):
         print("Recieved:", message.content.split())
@@ -35,6 +36,11 @@ async def on_message(message: discord.Message):
 async def martjin_backdoor(message: discord.Message):
     if str(message.author) == "m4rt1n1955":
         await message.send("Martin Martin er en uran hjort...")
+
+
+async def alehandre_backdoor(message: discord.Message):
+    if str(message.author) == "alehandre":
+        await message.send("Skibidi toilet sunset rizzler morning")
 
 
 async def zadd_backdoor(message: discord.Message):
