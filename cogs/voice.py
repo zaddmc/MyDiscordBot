@@ -25,7 +25,7 @@ class Voice(commands.Cog):
             channel = ctx.message.author.voice.channel
             await channel.connect()
             # Play Martin er en uran hjort
-            crx.message.guild.voice_client.play(
+            ctx.message.guild.voice_client.play(
                 discord.FFmpegPCMAudio(
                     executable="ffmpeg", source="songs/vGzJct0OV8M.mp3"
                 )
