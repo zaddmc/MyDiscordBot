@@ -24,6 +24,12 @@ class Voice(commands.Cog):
         else:
             channel = ctx.message.author.voice.channel
             await channel.connect()
+            # Play Martin er en uran hjort
+            channel.play(
+                discord.FFmpegPCMAudio(
+                    executable="ffmpeg", source="songs/vGzJct0OV8M.mp3"
+                )
+            )
 
     @commands.command(name="leave", help="Tells the bot to leave voice channels")
     async def leave(self, ctx):
