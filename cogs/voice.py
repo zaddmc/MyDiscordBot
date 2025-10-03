@@ -27,7 +27,7 @@ class Voice(commands.Cog):
             # Play Martin er en uran hjort
             ctx.message.guild.voice_client.play(
                 discord.FFmpegPCMAudio(
-                    executable="ffmpeg", source="songs/vGzJct0OV8M.mp3"
+                    executable="ffmpeg", source="songs/intro_song_martin.mp3"
                 )
             )
 

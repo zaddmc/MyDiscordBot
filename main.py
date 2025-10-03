@@ -30,6 +30,8 @@ async def on_ready():
 async def on_message(message: discord.Message):
     if message.author == bot.user:
         return
+    if str(message.channel) == "udviklings-kanal":
+        return
 
     await zh.zadd_backdoor(bot, message)
     await zh.always_respond_to(
