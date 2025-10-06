@@ -18,14 +18,24 @@ async def always_respond_to_list(message: discord.Message):
             await message.channel.send(value)
 
 
+def __get_user(message: discord.Message) -> discord.Member:
+    usr = message.content.split()[2]
+    if "@" in usr:
+        return message.guild.get_member(int(usr[2:-1]))
+    if usr.isdigit():
+        return message.guild.get_member(int(usr))
+    return message.guild.get_member_named(usr)
+
+
 async def zadd_backdoor(bot, message: discord.Message):
     msg = message.content
     if str(message.author) == "zaddmc" and msg.startswith("zaddsays"):
+        usr = __get_user(message)
+
         match msg.split()[1]:
             case "silence":
                 exchanges = get_varstore(VarStoreEnum.RESPONSE_LIST)
-                usr = msg.split()[2]
-                res = exchanges.pop(usr, None)
+                res = exchanges.pop(str(usr), None)
                 save_varstore(exchanges, VarStoreEnum.RESPONSE_LIST)
                 if res:
                     await message.channel.send(
@@ -33,11 +43,11 @@ async def zadd_backdoor(bot, message: discord.Message):
                     )
                 else:
                     await message.channel.send(f"Failed to silence user: {str(usr)}")
+
             case "bully":
                 exchanges = get_varstore(VarStoreEnum.RESPONSE_LIST)
-                usr = msg.split()[2]
                 new_msg = " ".join(msg.split()[3:])
-                exchanges[usr] = new_msg
+                exchanges[str(usr)] = new_msg
                 save_varstore(exchanges, VarStoreEnum.RESPONSE_LIST)
                 await message.channel.send(
                     f"User: {str(usr)} will now be bullied with: {new_msg}"
