@@ -44,3 +44,23 @@ def get_filename(url: str) -> str:
         return f"songs/{url_code}"
     else:
         return download(url)
+
+
+from enum import Enum
+
+
+class VarStoreEnum(Enum):
+    """This Enum exists to make it clear which types of variable storages are available"""
+
+    RESPONSE_LIST = "response_list"
+
+
+def get_varstore(target: VarStoreEnum) -> dict | None:
+    with open(f"./varstore/{target.value}.txt", "r") as file:
+        data = file.read()
+    return eval(data)
+
+
+def save_varstore(mydict: dict, target: VarStoreEnum) -> None:
+    with open(f"./varstore/{target.value}.txt", "w") as file:
+        file.write(str(mydict))

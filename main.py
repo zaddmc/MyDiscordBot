@@ -7,6 +7,7 @@ from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
 import zadd_handlers as zh
+from file_manager import VarStoreEnum, get_varstore
 
 
 class MyBot(commands.Bot):
@@ -30,22 +31,18 @@ async def on_ready():
 async def on_message(message: discord.Message):
     if message.author == bot.user:
         return
-    if str(message.channel) == "udviklings-kanal":
+    if str(message.channel) in ["udviklings-kanal"]:
         return
 
     await zh.zadd_backdoor(bot, message)
-    await zh.always_respond_to(
-        message, "m4rt1n1955", "Martin Martin er en uran hjort..."
-    )
-    await zh.always_respond_to(
-        message, "alehandre", "Skibidi toilet sunset rizzler morning"
-    )
+    await zh.always_respond_to_list(message)
 
     if message.content.startswith("echo"):
         print("Recieved:", message.content.split())
         await message.channel.send(
             subprocess.check_output(message.content.split()).decode("utf-8").strip()
         )
+    # This line should be last to process the commands as specified in class MyBot
     await bot.process_commands(message)
 
 
