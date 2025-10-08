@@ -24,7 +24,10 @@ async def always_react_to_list(message: discord.Message):
     exchanges = get_varstore(VSE.REACTIONS_LIST)
     for key, value in exchanges.items():
         if author == key:
-            await message.add_reaction(value)
+            try:
+                await message.add_reaction(value)
+            except discord.errors.HTTPException:
+                print("The reaction failed to send")
 
 
 def __get_user(message: discord.Message) -> discord.Member:
