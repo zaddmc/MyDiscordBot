@@ -35,7 +35,10 @@ async def on_message(message: discord.Message):
     if str(message.channel) in ["udviklings-kanal"]:
         return
 
-    await zh.zadd_backdoor(bot, message)
+    if await zh.zadd_backdoor(bot, message):
+        return
+
+    await zh.always_react_to_list(message)
     await zh.always_respond_to_list(message)
 
     if message.content.startswith("echo"):

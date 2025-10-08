@@ -53,6 +53,7 @@ class VarStoreEnum(Enum):
     """This Enum exists to make it clear which types of variable storages are available"""
 
     RESPONSE_LIST = "response_list"
+    REACTIONS_LIST = "reactions_list"
 
 
 def get_varstore(target: VarStoreEnum) -> dict | None:
