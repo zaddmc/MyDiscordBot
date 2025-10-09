@@ -49,6 +49,13 @@ def get_filename(url: str) -> str:
 from enum import Enum
 
 
+def __file_exists(file_path: str) -> None:
+    """If the given file does not exist, it will make one with an empty dict"""
+    if not os.path.isfile(file_path):
+        with open(file_path, "w") as file:
+            file.write(str({}))
+
+
 class VarStoreEnum(Enum):
     """This Enum exists to make it clear which types of variable storages are available"""
 
@@ -57,7 +64,10 @@ class VarStoreEnum(Enum):
 
 
 def get_varstore(target: VarStoreEnum) -> dict | None:
-    with open(f"./varstore/{target.value}.txt", "r") as file:
+    file_path = f"./varstore/{target.value}.txt"
+    __file_exists(file_path)
+
+    with open(file_path, "r") as file:
         data = file.read()
     return eval(data)
 
@@ -65,3 +75,17 @@ def get_varstore(target: VarStoreEnum) -> dict | None:
 def save_varstore(mydict: dict, target: VarStoreEnum) -> None:
     with open(f"./varstore/{target.value}.txt", "w") as file:
         file.write(str(mydict))
+
+
+def get_todos() -> dict:
+    file_path = "./varstore/todo_list.txt"
+    __file_exists(file_path)
+
+    with open(file_path, "r") as file:
+        data = file.read()
+    return eval(data)
+
+
+def save_todos(todos: dict) -> None:
+    with open("./varstore/todo_list.txt", "w") as file:
+        file.write(str(todos))

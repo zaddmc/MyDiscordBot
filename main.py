@@ -13,6 +13,7 @@ from file_manager import VarStoreEnum, get_varstore
 class MyBot(commands.Bot):
     async def setup_hook(self):
         await self.load_extension("cogs.voice")
+        await self.load_extension("cogs.todo")
 
 
 intents = discord.Intents.default()

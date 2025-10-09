@@ -55,17 +55,12 @@ async def remove_from_varstore(
     if varstores == None:
         varstores = VSE
 
-    res = []
     for varstore in varstores:
         exchanges = get_varstore(varstore)
-        res.append(exchanges.pop(str(usr), None))
+        exchanges.pop(str(usr), None)
         save_varstore(exchanges, varstore)
 
-    if all(res):
-        await message.channel.send(f"User: {str(usr)}, will no longer be mentioned")
-    else:
-        print("Some exception occurred during the silenceing process: ", res)
-        await message.channel.send(f"Failed to silence user: {str(usr)}")
+    await message.channel.send(f"User: {str(usr)}, will no longer be made fun of")
 
 
 async def zadd_backdoor(bot, message: discord.Message):

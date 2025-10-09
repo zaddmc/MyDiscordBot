@@ -3,3 +3,6 @@ __pycache__/
 
 !songs/.gitkeep
 songs/*.mp3
+
+!varstore/.gitkeep
+varstore/*.txt
