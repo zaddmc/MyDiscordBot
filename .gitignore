@@ -1,8 +1,9 @@
 .env
 __pycache__/
 
-!songs/.gitkeep
 songs/*.mp3
+!songs/.gitkeep
+!songs/intro_song_martin.mp3
 
-!varstore/.gitkeep
 varstore/*.txt
+!varstore/.gitkeep
