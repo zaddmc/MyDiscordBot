@@ -70,7 +70,7 @@ async def on_message(message: discord.Message):
 
 if __name__ == "__main__":
     load_dotenv()
-    DISCORD_TOKEN = os.getenv("DISCORD_TOKEN").strip("<>")
+    DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
     # client.run(DISCORD_TOKEN)
 
     bot.run(DISCORD_TOKEN)
