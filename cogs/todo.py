@@ -34,6 +34,16 @@ class Todo(commands.Cog):
             return
         await ctx.channel.send("Todo was not found :(")
 
+    @commands.command(name="gettodos")
+    async def get_todos(self, ctx: commands.Context):
+        todos = get_todos()
+        string = ""
+        for head, body in todos.items():
+            string += "**" + head + "**: "
+            string += body + "\n"
+        string.strip()
+        await ctx.send(string)
+
 
 async def setup(bot):
     await bot.add_cog(Todo(bot))

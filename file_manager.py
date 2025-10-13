@@ -77,6 +77,27 @@ def save_varstore(mydict: dict, target: VarStoreEnum) -> None:
         file.write(str(mydict))
 
 
+class Todo:
+    def __init__(self, *args):
+        match len(args):
+            case 0:
+                raise ValueError("Missing arguments in Todo Init")
+            case 1:
+                if isinstance(args, tuple):
+                    self.contents = args[0]
+                    self.sender = args[1]
+                    self.target = args[2]
+                    self.publish_date = args[3]
+            case 4:
+                self.contents = args[0]
+                self.sender = args[1]
+                self.target = args[2]
+                self.publish_date = args[3]
+
+    def __str__(self):
+        return (self.contents, self.sender, self.target, self.publish_date)
+
+
 def get_todos() -> list:
     file_path = "./varstore/todo_list.txt"
     __file_exists(file_path, default=list)
