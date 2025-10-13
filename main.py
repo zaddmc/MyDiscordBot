@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 
 import zadd_handlers as zh
 from file_manager import VarStoreEnum, get_varstore
+from utils import get_guilds
 
 
 class MyBot(commands.Bot):
@@ -26,7 +27,14 @@ bot = MyBot(command_prefix="!", intents=intents)
 
 @bot.event
 async def on_ready():
-    print(f"We have logged in as {bot.user}")
+    for g in get_guilds():
+        await bot.tree.sync(guild=g)
+    print("I am ready to fight")
+
+
+@bot.tree.command(name="hell", description="I am dis")
+async def slash_command(interaction: discord.Interaction):
+    await interaction.response.send_message("Command")
 
 
 @bot.event
