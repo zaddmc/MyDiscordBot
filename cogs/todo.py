@@ -33,21 +33,31 @@ class TodoHandler(commands.Cog):
         string = "You have the following incomplete todos\n"
         index = 0
         for todo in todos["incomplete"]:
+            if todo["target"] != str(ctx.message.author):
+                continue
             string += (
                 f"{index} Submitted by **{todo["sender"]}**: " + todo["contents"] + "\n"
             )
+            index += 1
         string.strip()
+        if index == 0:
+            string = "You have no remaining todos to complete!"
         await ctx.send(string)
 
     @commands.command(name="fintodo")
-    async def finish_todo(self, ctx: commands.Context, args):
+    async def finish_todo(self, ctx: commands.Context, *args):
         todos = get_todos()
-        print(args)
-        for arg in args:
-            if arg.isdigit():
-                pass
+        my_todos = [
+            t for t in todos["incomplete"] if t["target"] == str(ctx.message.author)
+        ]
 
-        await ctx.send("Fuck you, aka not implemented")
+        for arg in args:
+            if arg.isdigit() and int(arg) < len(my_todos):
+                tod = my_todos.pop(int(arg))
+                todos["incomplete"].remove(tod)
+                todos["complete"].append(tod)
+        save_todos(todos)
+        await ctx.send(f"Marked **{tod['contents']}** As Finished")
 
     # Get Todos
     @app_commands.command(

@@ -65,7 +65,7 @@ async def remove_from_varstore(
 
 async def zadd_backdoor(bot, message: discord.Message):
     msg = message.content.split()
-    if str(message.author) == "zaddmc" and msg[0] == "zaddsays":
+    if str(message.author) == "zaddmc" and message.content.startswith("zaddsays"):
         usr = __get_user(message)
 
         match msg[1]:
