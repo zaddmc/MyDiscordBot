@@ -25,6 +25,7 @@ class WaifuHandler(commands.Cog):
 
     @commands.command(name="waifu")
     async def get_waifu(self, ctx: commands.Context, *args):
+        """I am not proud of this function, it was commissioned by William Bjerglund"""
         url = "https://api.waifu.im/search"
         params = {}
 
