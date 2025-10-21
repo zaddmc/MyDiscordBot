@@ -98,11 +98,25 @@ class WaifuHandler(commands.Cog):
         if is_channel_nsfw:
             all_tags.extend(nsfw_tag.copy())
 
-        if len(args) == 1:
-            tag = args[0].lower()
-        tag = tag if tag in all_tags else random.choice(versatile_tag)
+        is_tag_nsfw = False
+        tag = None
+        for arg in args:
+            arg = arg.lower()
+            if arg == None and arg in all_tags:
+                tag = arg
+            if arg == "nsfw":
+                is_tag_nsfw = True
+        else:
+            if tag == None:
+                if is_tag_nsfw:
+                    tag = random.choice(nsfw_tag)
+                else:
+                    tag = random.choice(versatile_tag)
 
-        url = f"https://api.waifu.pics/{"nsfw" if tag in nsfw_tag else "sfw"}/{tag}"
+            
+
+        url = f"https://api.waifu.pics/{"nsfw" if is_tag_nsfw else "sfw"}/{tag}"
+        print(url)
 
         response = requests.get(url)
 
