@@ -1,5 +1,6 @@
 import discord
 import requests
+import random
 from discord import app_commands
 from discord.ext import commands
 
@@ -7,13 +8,38 @@ from discord.ext import commands
 class WaifuHandler(commands.Cog):
     def __init__(self, bot):
         self.bot: discord.Bot = bot
+        self.allowed_tags = {
+            "versatile": [
+                "maid",
+                "waifu",
+                "marin-kitagawa",
+                "mori-calliope",
+                "raiden-shogun",
+                "oppai",
+                "selfies",
+                "uniform",
+                "kamisato-ayaka",
+            ],
+            "nsfw": ["ass", "hentai", "milf", "oral", "paizuri", "ecchi", "ero"],
+        }
 
     @commands.command(name="waifu")
-    async def get_waifu(self, ctx: commands.Context):
+    async def get_waifu(self, ctx: commands.Context, *args):
         url = "https://api.waifu.im/search"
         params = {}
 
-        response = requests.get(url, params)
+        is_channel_nsfw = getattr(ctx.channel, "is_nsfw", lambda: False)()
+
+        all_tags = list(self.allowed_tags["versatile"])
+        if is_channel_nsfw:
+            all_tags.extend(self.allowed_tags["nsfw"])
+
+        valid_tags = [b for b in map(lambda a: a.lower(),args) if b in all_tags]
+
+        params["included_tags"] = ",".join(valid_tags)
+        params["nsfw"] = "true" if is_channel_nsfw else "false"    
+
+        response = requests.get(url, params=params)
 
         if response.status_code == 200:
             data = response.json()
@@ -26,14 +52,13 @@ class WaifuHandler(commands.Cog):
         url = "https://icanhazdadjoke.com/"
         headers = {"Accept": "text/plain"}
 
-        response = requests.get(url,headers=headers)
+        response = requests.get(url, headers=headers)
 
         if response.status_code == 200:
             data = response.text
             await ctx.send(data)
         else:
             await ctx.send("You...")
-
 
 
 from utils import get_guilds
