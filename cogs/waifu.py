@@ -8,32 +8,32 @@ from discord.ext import commands
 class WaifuHandler(commands.Cog):
     def __init__(self, bot):
         self.bot: discord.Bot = bot
-        self.allowed_tags = {
-            "versatile": [
-                "maid",
-                "waifu",
-                "marin-kitagawa",
-                "mori-calliope",
-                "raiden-shogun",
-                "oppai",
-                "selfies",
-                "uniform",
-                "kamisato-ayaka",
-            ],
-            "nsfw": ["ass", "hentai", "milf", "oral", "paizuri", "ecchi", "ero"],
-        }
 
     @commands.command(name="waifu")
     async def get_waifu(self, ctx: commands.Context, *args):
         """I am not proud of this function, it was commissioned by William Bjerglund"""
+
+        versatile_tag = [
+            "maid",
+            "waifu",
+            "marin-kitagawa",
+            "mori-calliope",
+            "raiden-shogun",
+            "oppai",
+            "selfies",
+            "uniform",
+            "kamisato-ayaka",
+        ]
+        nsfw_tag = ["ass", "hentai", "milf", "oral", "paizuri", "ecchi", "ero"]
+
         url = "https://api.waifu.im/search"
         params = {}
 
         is_channel_nsfw = getattr(ctx.channel, "is_nsfw", lambda: False)()
 
-        all_tags = list(self.allowed_tags["versatile"])
+        all_tags = versatile_tag.copy()
         if is_channel_nsfw:
-            all_tags.extend(self.allowed_tags["nsfw"])
+            all_tags.extend(nsfw_tag.copy())
 
         valid_tags = [b for b in map(lambda a: a.lower(),args) if b in all_tags]
 
@@ -45,6 +45,70 @@ class WaifuHandler(commands.Cog):
         if response.status_code == 200:
             data = response.json()
             await ctx.send(data["images"][0]["url"])
+        else:
+            await ctx.send("Failed to get image")
+
+    @commands.command(name="waifu2")
+    async def get_waifu2(self, ctx: commands.Context, *args):
+        """I am not proud of this function, it was commissioned by William Bjerglund"""
+
+        versatile_tag = [
+         "waifu",
+        "neko",
+        "shinobu",
+        "megumin",
+        "bully",
+        "cuddle",
+        "cry",
+        "hug",
+        "awoo",
+        "kiss",
+        "lick",
+        "pat",
+        "smug",
+        "bonk",
+        "yeet",
+        "blush",
+        "smile",
+        "wave",
+        "highfive",
+        "handhold",
+        "nom",
+        "bite",
+        "glomp",
+        "slap",
+        "kill",
+        "kick",
+        "happy",
+        "wink",
+        "poke",
+        "dance",
+        ]
+        nsfw_tag = [
+             "waifu",
+        "neko",
+        "trap",
+        "blowjob",
+        ]
+
+
+        is_channel_nsfw = getattr(ctx.channel, "is_nsfw", lambda: False)()
+
+        all_tags = versatile_tag.copy()
+        if is_channel_nsfw:
+            all_tags.extend(nsfw_tag.copy())
+
+        if len(args) == 1:
+            tag = args[0].lower()
+        tag = tag if tag in all_tags else random.choice(versatile_tag)
+
+        url = f"https://api.waifu.pics/{"nsfw" if tag in nsfw_tag else "sfw"}/{tag}"
+
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+            await ctx.send(data["url"])
         else:
             await ctx.send("Failed to get image")
 
