@@ -21,6 +21,20 @@ class WaifuHandler(commands.Cog):
         else:
             await ctx.send("Failed to get image")
 
+    @commands.command(name="joke")
+    async def get_joke(self, ctx: commands.Context):
+        url = "https://icanhazdadjoke.com/"
+        headers = {"Accept": "text/plain"}
+
+        response = requests.get(url,headers=headers)
+
+        if response.status_code == 200:
+            data = response.text
+            await ctx.send(data)
+        else:
+            await ctx.send("You...")
+
+
 
 from utils import get_guilds
 
