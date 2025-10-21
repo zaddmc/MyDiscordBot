@@ -102,7 +102,7 @@ class WaifuHandler(commands.Cog):
         tag = None
         for arg in args:
             arg = arg.lower()
-            if arg == None and arg in all_tags:
+            if tag == None and arg in all_tags:
                 tag = arg
             if arg == "nsfw":
                 is_tag_nsfw = True
@@ -113,6 +113,8 @@ class WaifuHandler(commands.Cog):
                 else:
                     tag = random.choice(versatile_tag)
 
+        if tag in nsfw_tag and not is_tag_nsfw and tag not in versatile_tag:
+            is_tag_nsfw = True
             
 
         url = f"https://api.waifu.pics/{"nsfw" if is_tag_nsfw else "sfw"}/{tag}"
