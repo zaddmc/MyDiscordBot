@@ -15,6 +15,7 @@ class MyBot(commands.Bot):
     async def setup_hook(self):
         await self.load_extension("cogs.voice")
         await self.load_extension("cogs.todo")
+        await self.load_extension("cogs.meet")
         await self.load_extension("cogs.waifu")
 
 

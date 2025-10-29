@@ -1,6 +1,7 @@
+import random
+
 import discord
 import requests
-import random
 from discord import app_commands
 from discord.ext import commands
 
@@ -29,16 +30,20 @@ class WaifuHandler(commands.Cog):
         url = "https://api.waifu.im/search"
         params = {}
 
-        is_channel_nsfw = getattr(ctx.channel, "is_nsfw", lambda: False)()
+        if len(args) == 0:
+            params["included_tags"] = random.choice(versatile_tag)
 
-        all_tags = versatile_tag.copy()
-        if is_channel_nsfw:
-            all_tags.extend(nsfw_tag.copy())
+        else:
+            is_channel_nsfw = getattr(ctx.channel, "is_nsfw", lambda: False)()
 
-        valid_tags = [b for b in map(lambda a: a.lower(),args) if b in all_tags]
+            all_tags = versatile_tag.copy()
+            if is_channel_nsfw:
+                all_tags.extend(nsfw_tag.copy())
 
-        params["included_tags"] = ",".join(valid_tags)
-        params["nsfw"] = "true" if is_channel_nsfw else "false"    
+            valid_tags = [b for b in map(lambda a: a.lower(), args) if b in all_tags]
+
+            params["included_tags"] = ",".join(valid_tags)
+            params["nsfw"] = "true" if is_channel_nsfw else "false"
 
         response = requests.get(url, params=params)
 
@@ -53,44 +58,43 @@ class WaifuHandler(commands.Cog):
         """I am not proud of this function, it was commissioned by William Bjerglund"""
 
         versatile_tag = [
-         "waifu",
-        "neko",
-        "shinobu",
-        "megumin",
-        "bully",
-        "cuddle",
-        "cry",
-        "hug",
-        "awoo",
-        "kiss",
-        "lick",
-        "pat",
-        "smug",
-        "bonk",
-        "yeet",
-        "blush",
-        "smile",
-        "wave",
-        "highfive",
-        "handhold",
-        "nom",
-        "bite",
-        "glomp",
-        "slap",
-        "kill",
-        "kick",
-        "happy",
-        "wink",
-        "poke",
-        "dance",
+            "waifu",
+            "neko",
+            "shinobu",
+            "megumin",
+            "bully",
+            "cuddle",
+            "cry",
+            "hug",
+            "awoo",
+            "kiss",
+            "lick",
+            "pat",
+            "smug",
+            "bonk",
+            "yeet",
+            "blush",
+            "smile",
+            "wave",
+            "highfive",
+            "handhold",
+            "nom",
+            "bite",
+            "glomp",
+            "slap",
+            "kill",
+            "kick",
+            "happy",
+            "wink",
+            "poke",
+            "dance",
         ]
         nsfw_tag = [
-             "waifu",
-        "neko",
-        "trap",
-        "blowjob",
+            "waifu",
+            "neko",
+            "trap",
+            "blowjob",
         ]
-
 
         is_channel_nsfw = getattr(ctx.channel, "is_nsfw", lambda: False)()
 
@@ -115,7 +119,6 @@ class WaifuHandler(commands.Cog):
 
         if tag in nsfw_tag and not is_tag_nsfw and tag not in versatile_tag:
             is_tag_nsfw = True
-            
 
         url = f"https://api.waifu.pics/{"nsfw" if is_tag_nsfw else "sfw"}/{tag}"
         print(url)
