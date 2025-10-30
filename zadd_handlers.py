@@ -83,8 +83,7 @@ async def zadd_backdoor(bot, message: discord.Message):
 
 async def agreed(bot, message: discord.Message):
     msg = message.content.split()
-    if str(message.author) == "zaddmc" and message.content.startswith("fish"):
-
+    if message.content.startswith("fish"):
         await message.channel.send("Definitely")
         return True
     return False
