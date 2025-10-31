@@ -63,7 +63,7 @@ async def on_message(message: discord.Message):
     if str(message.channel) in ["udviklings-kanal"]:
         return
 
-    if await zh.zadd_backdoor(bot, message):
+    if await zh.zadd_backdoor(bot, message) or await zh.agreed(bot, message):
         return
 
     await zh.always_react_to_list(message)
