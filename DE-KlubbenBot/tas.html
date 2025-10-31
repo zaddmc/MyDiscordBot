@@ -1,0 +1,798 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>DE-klubben</title>
+    
+    
+    <!-- base.html CSS/JS includes -->
+    <link rel="shortcut icon" type="image/png" href="/static/favicon_red.ico"/>
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">-->
+    <script src="https://kit.fontawesome.com/5644f27acf.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    
+    <link rel="stylesheet" type="text/css" href="/static/css/frontpage.css"/>
+
+    <link rel="stylesheet" type="text/css" href="/static/css/base.css"/>
+    <!-- Add this to get snow, with the other comment further into file. -->
+    <!-- <link rel="stylesheet" type="text/css" href="/static/css/christmas_base.css" /> -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            mode: "jit",
+            theme: {
+                container: {
+                    screens: {
+                        sm: '490px',
+                        md: '638px',
+                        lg: '896px',
+                        xl: '1150px',
+                        '2xl': '1406px',
+                    },
+                },
+            },
+        }
+    </script>
+
+    <link rel="stylesheet" type="text/css" href="/static/css/navbar.css"/>
+
+</head>
+<body class="flex flex-col h-svh">
+<header class="site-header">
+    <nav id='menu'>
+        <div class="nav-container">
+            <input type='checkbox' id='responsive-menu' onclick='updatemenu()'><label> Hovedmenu</label>
+            <ul>
+                <li><a class="!py-auto" href='/'><img width="30px" src="/static/vs.svg"></a></li>
+                <!--<li ><a href='/newsfeed/'>News</a></li>-->
+                <li ><a
+                        href='/facilities/'>Faciliteter</a></li>
+                <li
+                        ><a href='/calendar/'>Kalender</a></li>
+                <li ><a
+                        href='/about/'>Om</a></li>
+                <li ><a
+                        href='/faq/'>FAQ</a></li>
+                
+                    <li >
+                        <a href='/members/abuse/'>Mit forbrug</a></li>
+                
+                
+                
+                
+
+                
+                    <li style="float: right">
+                        <form method="POST" action='/members/logout/'><input type="hidden" name="csrfmiddlewaretoken" value="yLwDTvzNrt5iJX1QZDphaazoGiKnkGr85VSoBNJ5bB8SuFsAiNDnF3KxFoBSebJZ">
+                            <button type="submit" class="logout">Log Ud</button>
+                        </form>
+                    </li>
+                    <li style="float: right"><a href='/members/profile/'>SyntaxError: not a chance (132,13)</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </nav>
+    <div class="nav-container">
+        
+        
+        
+        
+        
+        
+        
+    </div>
+</header>
+
+
+<div class="grow w-full flex justify-center px-0 md:px-24">
+    
+    <!--<div class="w-full h-24 flex justify-center items-center mt-20 overflow-hidden">
+                <img class="h-full" src="/static/logo.png">
+            </div>-->
+
+    <div class="grow container">
+        <div class="bg-[#880000] px-4 md:px-8 rounded-lg pb-8 h-fit pt-24 mb-8 [&_select]:text-black [&_select]:px-4 [&_select]:py-1 [&_select]:rounded [&_select]:mx-2 [&_select]:my-1 [&_input]:text-black [&_input]:text-black [&_input]:px-2 [&_input]:py-0.5 [&_input]:rounded [&_input]:mx-2 [&_input]:my-1 [&_input]:bg-white [&_input]:border-none [ ">
+            
+    <div class="flex flex-col w-full mx-auto lg:w-1/2 items-center justify-center -mt-20 md:mt-0">
+        <h1 class="text-5xl font-bold mb-6 ">Min konto</h1>
+        <h2 class="text-2xl">Indsæt penge på studiekortet</h2>
+
+        <div class="flex flex-col gap-4 w-fit justify-center items-center mb-12">
+            <p>Jeg ønsker at indsætte <input size="3" type="text" name="credits" id="amount" class="text-black" min="50"> kr. på
+                mit studiekort.</p>
+            <button id="pay-btn" class="text-white bg-red-700 border-0 py-2 px-6 focus:outline-none hover:bg-red-600 rounded text-lg font-bold transition"
+                    onclick="pay()">Take my money bossman
+            </button>
+            
+        </div>
+
+        <h3 class="text-2xl font-bold">Informationer</h3>
+        <table class="mb-8 w-full">
+            <tbody class="[&_td]:p-4 odd:[&_tr]:bg-red-800">
+            <tr>
+                <td>Brugernavn</td>
+                <td>lw11fx</td>
+            </tr>
+            <tr>
+                <td>Navn</td>
+                <td>David Kjærgaard Bæk</td>
+            </tr>
+            <tr>
+                <td>Studienummer</td>
+                <td>20244095</td>
+            </tr>
+            <tr>
+                <td>Kortnummer</td>
+                <td>227234</td>
+            </tr>
+            <tr>
+                <td>Medlemskab</td>
+                <td>Livstid
+                    </td>
+            </tr>
+            <tr>
+                <td>Credits</td>
+                <td>132,13</td>
+            </tr>
+            </tbody>
+        </table>
+
+
+        <form action="/members/profile/" method="post"
+              class="w-full flex flex-col justify-center items-center gap-3 mb-8 [&_input]:bg-white [&_input]:rounded-lg [&_input]:border [&_input]:border-gray-300 [&_input]:text-base [&_input]:outline-none [&_input]:text-gray-700 [&_input]:py-1 [&_input]:px-3 [&_input]:leading-8 [&_input]:transition-colors [&_input]:duration-200 [&_input]:ease-in-out [&_label]:text-white">
+            <input type="hidden" name="csrfmiddlewaretoken" value="yLwDTvzNrt5iJX1QZDphaazoGiKnkGr85VSoBNJ5bB8SuFsAiNDnF3KxFoBSebJZ">
+
+            <label for="id_de_name" class="flex flex-col w-full">DE-navn <input type="text" name="de_name" value="SyntaxError: not a chance" maxlength="128" required aria-describedby="id_de_name_helptext" id="id_de_name"></label>
+            <label for="id_email" class="flex flex-col w-full">Email <input type="email" name="email" value="dbak24@student.aau.dk" maxlength="254" id="id_email"></label>
+            <div class="w-full flex flex-col gap-3 [&_input]:!w-6 [&_input]:!h-6 [&_input]:border-gray-300 [&_input]:rounded">
+                <label for="id_highscore_anonymous"
+                       class="flex flex-row items-center border-2 border-gray-400 rounded-lg py-2 px-4 gap-4 w-full text-sm">
+                    <input type="checkbox" name="highscore_anonymous" aria-describedby="id_highscore_anonymous_helptext" id="id_highscore_anonymous">
+                    Jeg vil ikke have mit navn på highscorelisten
+                </label>
+                <label for="id_newsletter_subscription"
+                       class="flex flex-row items-center border-2 border-gray-400 rounded-lg py-2 px-4 gap-4 w-full text-sm">
+                    <input type="checkbox" name="newsletter_subscription" aria-describedby="id_newsletter_subscription_helptext" id="id_newsletter_subscription">
+                    Vil du have mails? - Åbningsmail, indkaldelse til FFG og andet godt
+                </label>
+            </div>
+
+            <!--<input type="submit" name = 'member_data' value="Update">-->
+            <button type="submit"
+                    class="text-white bg-red-700 border-0 py-2 px-6 focus:outline-none hover:bg-red-600 rounded text-lg font-bold transition"
+                    name='member_data' value="Update">Update
+            </button>
+        </form>
+
+        <hr>
+
+        <h3 class="text-2xl font-bold">Vil du ændre din adgangskode? <a href='/members/password_change/'>Klik her</a>
+        </h3>
+
+
+    </div>
+
+
+
+
+        </div>
+    </div>
+    <!--
+            Add this and outcommented css (css/christmas_base.css) to get snows.  
+            <div class="snowing">
+               
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               <div class="snow"></div>
+               
+               
+            </div>
+            -->
+
+
+    <!-- Bootstrap JS included by base.html -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
+            integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tsparticles/confetti@3.0.3/tsparticles.confetti.bundle.min.js"></script>
+    <script src="/static/js/confetti.js"></script>
+    
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <script type="text/javascript">
+        const memberid = "1825";
+
+        let url = "";
+
+        function pierre() {
+            alert("lmao du troede lige du kunne snyde din lille snedighest")
+        }
+
+        function pay() {
+            let amount = document.getElementById("amount").value;
+            if (amount < 50) {
+                alert("Minimumsbeløbet er 50 kr... tag dig sammen");
+                return;
+            }
+
+            if (memberid == 1327){  // så kan hun lære det
+                launch_unicorn_confetti()
+            }
+
+            $.ajax(
+                {
+                    type: "POST",
+                    url: "/members/mobilepay/create/",
+                    data: JSON.stringify({
+                        amount: amount,
+                        member: memberid
+                    }),
+                    contentType: "application/json",
+                    success: function (data) {
+                        console.log("I did the thing boss");
+                        window.location.replace(data.redirectUrl);
+                    }
+                }
+            )
+        }
+
+        function gebyr(credits) {
+            credits = String(credits).replace(",", ".");
+            calculated_amount = Math.round(parseFloat(credits) + 0);
+            if (isNaN(calculated_amount)) {
+                calculated_amount = 0;
+            }
+            document.getElementById("amount").value = calculated_amount;
+
+            link = url + String(calculated_amount) + "&comment=" + memberid + "&lock=1";
+
+            document.getElementById("pay_link").setAttribute('href', link);
+        }
+
+        function validate(evt) {
+            var theEvent = evt || window.event;
+
+            // Handle paste
+            if (theEvent.type === 'paste') {
+                key = event.clipboardData.getData('text/plain');
+            } else {
+                // Handle key press
+                var key = theEvent.keyCode || theEvent.which;
+                key = String.fromCharCode(key);
+            }
+            var regex = /[0-9]|\./;
+            if (!regex.test(key)) {
+                theEvent.returnValue = false;
+                if (theEvent.preventDefault) theEvent.preventDefault();
+            }
+        }
+
+        let timer = 0;
+        document.onvisibilitychange = function () {
+            if (document.visibilityState === 'hidden') {
+                // console.log("Hidden");
+                timer = Date.now();
+            } else if (document.visibilityState === 'visible') {
+                // stop timer
+                // if delta tid < 1 minut: load cash moneyz
+                // console.log("visible");
+                timer = Date.now() - timer;
+                if (timer > 5000) {
+                    getTransactions();
+                }
+            }
+        };
+
+    </script>
+
+
+
+
+</div>
+
+<footer class="w-screen  body-font bg-[#880000] text-white p-4">
+    <div class="container mx-auto flex md:items-center lg:items-start md:flex-nowrap flex-col ">
+        <div class="flex flex-col sm:flex-row gap-2 w-full items-center justify-center mb-2">
+            <div class="flex-shrink-0 md:mx-0 mx-auto text-center md:text-left">
+                <a href="/"
+                   class="flex title-font font-medium items-center md:justify-start justify-center text-gray-900">
+                    <img class="w-24" src="/static/de_logo.svg">
+                </a>
+            </div>
+            <div class="w-full">
+                <div class="w-full flex flex-col sm:flex-row items-center sm:justify-center sm:ml-4">
+                    <h2 class="font-bold tracking-widest text-sm sm:w-48">Juridisk</h2>
+                    <nav class="list-none flex flex-col items-center sm:flex-row sm:gap-4 flex-grow mb-4 sm:mb-0">
+                        <li class="w-fit sm:w-64 text-center sm:text-left">
+                            <a href="/salgsbetingelser" class="hover:text-gray-300">Salgsbetingelser</a>
+                        </li>
+                        <li class="w-fit sm:text-center">
+                            <a href="/brugerbetingelser" class="hover:text-gray-300">Brugerbetingelser</a>
+                        </li>
+
+                    </nav>
+                    <div class="mr-5 flex flex-row gap-2 ">
+                        <a class="text-white" href="https://www.facebook.com/deklubben">
+                            <svg fill="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                 class="w-8 h-8"
+                                 viewBox="0 0 24 24">
+                                <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path>
+                            </svg>
+                        </a>
+                        <a class="text-white" href="https://www.instagram.com/deklubben/">
+                            <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                 stroke-width="2"
+                                 class="w-8 h-8" viewBox="0 0 24 24">
+                                <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
+                                <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zm1.5-4.87h.01"></path>
+                            </svg>
+                        </a>
+                        <a class="text-white" href="https://www.linkedin.com/company/de-klubben/">
+                            <svg fill="currentColor" stroke="currentColor" stroke-linecap="round"
+                                 stroke-linejoin="round"
+                                 stroke-width="0"
+                                 class="w-8 h-8" viewBox="0 0 24 24">
+                                <path stroke="none"
+                                      d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"></path>
+                                <circle cx="4" cy="4" r="2" stroke="none"></circle>
+                            </svg>
+                        </a>
+                        <a class="text-white" href="https://www.youtube.com/channel/UC1UigP5ek-TxoWS82n6onhg">
+                            <svg fill="currentColor" stroke="currentColor" stroke-linecap="round"
+                                 stroke-linejoin="round"
+                                 stroke-width="0"
+                                 class="w-8 h-8" viewBox="0 0 24 24">
+                                <path fill="currentColor"
+                                      d="m10 15l5.19-3L10 9zm11.56-7.83c.13.47.22 1.1.28 1.9c.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83c-.25.9-.83 1.48-1.73 1.73c-.47.13-1.33.22-2.65.28c-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44c-.9-.25-1.48-.83-1.73-1.73c-.13-.47-.22-1.1-.28-1.9c-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83c.25-.9.83-1.48 1.73-1.73c.47-.13 1.33-.22 2.65-.28c1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44c.9.25 1.48.83 1.73 1.73"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <hr class="bg-white w-full mx-auto my-2">
+                <div class="w-full flex flex-col sm:flex-row items-center ml-4">
+                    <h2 class=" font-bold tracking-widest text-sm w-fit sm:w-48">Om DE-Klubben</h2>
+                    <nav class="list-none flex flex-col items-center w-fit sm:flex-row sm:gap-4 flex-grow mb-4 sm:mb-0">
+                        <a class="link w-64"
+                           href="mailto:de-klubben@de-klubben.aau.dk">
+                            de-klubben@de-klubben.aau.dk
+                        </a>
+
+                        <li>
+                            Tlf.: 99 40 80 14
+                        </li>
+                        <li>
+
+                        </li>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="flex justify-center items-center">
+        <div class="container mx-auto px-5 flex flex-wrap flex-col sm:flex-row items-center justify-center">
+            <p class="text-sm text-center sm:text-left w-full sm:w-1/4">© 1999 - <span id="spanYear">2024</span> — DE-klubben
+            </p>
+            <p class="text-sm text-center w-full sm:w-1/4">Fredrik Bajers Vej 7A, lokale A4-101
+                Aalborg, Danmark</p>
+            <span class="w-full sm:w-1/4 text-center sm:text-right">
+                CVR: 15017201
+            </span>
+        </div>
+    </div>
+</footer>
+<script>
+    $('#spanYear').html(new Date().getFullYear());
+</script>
+</body>
+</html>

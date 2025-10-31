@@ -1,0 +1,1 @@
+curl --cookie csrftoken=HkwVSsksUidKVSBUtkogF3lj9g1F4Fs1 --cookie sessionid=a7pq84xgukzjtcpgl7g272rtzx3rog3s https://deklubben.dk/members/profile/ | pup 'input#id_de_name attr{value}'

@@ -82,12 +82,18 @@ class TodoHandler(commands.Cog):
         todos = get_todos()
         string = f"User: **{user.name}** has the following todos:\n"
         if state.value in ("all", "incomplete"):
-            for todo in todos["incomplete"]:
+            for todo in filter(
+                lambda d: user.name in (d["target"], "FishIn"),
+                todos["incomplete"],
+            ):
                 string += (
                     f"Submitted by **{todo["sender"]}**: " + todo["contents"] + "\n"
                 )
         elif state.value in ("all", "complete"):
-            for todo in todos["complete"]:
+            for todo in filter(
+                lambda d: user.name in (d["target"], "FishIn"),
+                todos["complete"],
+            ):
                 string += (
                     f"Submitted by **{todo["sender"]}**: " + todo["contents"] + "\n"
                 )
