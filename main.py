@@ -1,6 +1,7 @@
 import asyncio
 import os
 import subprocess
+import threading
 
 import discord
 from discord.ext import commands, tasks
@@ -23,6 +24,40 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.voice_states = True
 intents.members = True
+
+from flask import Flask, request
+
+app = Flask(__name__)
+
+
+@app.route("/github", methods=["POST"])
+def github_webhook():
+    if request.method != "POST":
+        return
+
+    payload = request.json
+    if payload.get("ref"):
+        repo = payload["repository"]["name"]
+        pusher = payload["pusher"]["name"]
+        commits = payload["commits"]
+
+        commit_messages = "\n".join(
+            [
+                f"- [{c['id'][:7]}] {c['message']} by {c['author']['name']}"
+                for c in commits
+            ]
+        )
+        message = f"New push to {repo} by {pusher}\n{commit_messages}"
+
+        cha = bot.get_channel(1425561165802770492)  # Server Usage - bot logs
+        if cha:
+            asyncio.run_coroutine_threadsafe(channel.send(message), bot.loop)
+    return "OK", 200
+
+
+def start_socket():
+    app.run(host="0.0.0.0", port=25565)
+
 
 bot = MyBot(command_prefix="!", intents=intents)
 
@@ -81,6 +116,6 @@ async def on_message(message: discord.Message):
 if __name__ == "__main__":
     load_dotenv()
     DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-    # client.run(DISCORD_TOKEN)
 
+    threading.Thread(target=start_socket).start()
     bot.run(DISCORD_TOKEN)
