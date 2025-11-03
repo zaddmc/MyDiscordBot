@@ -49,9 +49,13 @@ def github_webhook():
         )
         message = f"New push to {repo} by {pusher}\n{commit_messages}"
 
-        cha = bot.get_channel(1425561165802770492)  # Server Usage - bot logs
+        # cha = bot.get_channel(1425561165802770492)  # Server Usage - bot logs
+        cha = bot.get_channel(1434918137173774397)  # Comtek p3 - github
+
         if cha:
-            asyncio.run_coroutine_threadsafe(channel.send(message), bot.loop)
+            asyncio.run_coroutine_threadsafe(
+                channel.send(message, silent=True), bot.loop
+            )
     return "OK", 200
 
 
