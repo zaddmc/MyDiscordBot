@@ -80,23 +80,21 @@ class TodoHandler(commands.Cog):
         state: app_commands.Choice[str],
     ):
         todos = get_todos()
-        string = f"User: **{user.name}** has the following todos:\n"
-        if state.value in ("all", "incomplete"):
-            for todo in filter(
-                lambda d: user.name in (d["target"], "FishIn"),
-                todos["incomplete"],
-            ):
-                string += (
-                    f"Submitted by **{todo["sender"]}**: " + todo["contents"] + "\n"
-                )
-        elif state.value in ("all", "complete"):
-            for todo in filter(
-                lambda d: user.name in (d["target"], "FishIn"),
-                todos["complete"],
-            ):
-                string += (
-                    f"Submitted by **{todo["sender"]}**: " + todo["contents"] + "\n"
-                )
+        if user.name == "FishIn":
+            string = f"The group has the following todos\n"
+        else:
+            string = f"User: **{user.name}** has the following todos:\n"
+
+        in_todos = (
+            todos[state.value]
+            if state.value != "all"
+            else todos["complete"] + todos["incomplete"]
+        )
+        for todo in filter(lambda d: user.name in (d["target"], "FishIn"), in_todos):
+            if user.name == "FishIn":
+                string += f"Submitted by **{todo['sender']}**, intended for **{todo['target']}**: {todo['contents']}\n"
+            else:
+                string += f"Submitted by **{todo["sender"]}**: {todo["contents"]}\n"
         string.strip()
         await interaction.response.send_message(string)
 
