@@ -25,7 +25,10 @@ class TodoHandler(commands.Cog):
         todo = make_todo(contents, interaction.user.name, target.name)
         todos["incomplete"].append(todo)
         save_todos(todos)
-        await interaction.response.send_message(f"Was succesfully added")
+        await interaction.response.send_message(
+            f"Todo intended for **{todo['target']}**: {todo['contents']}\nWas Succesfully added",
+            silent=True,
+        )
 
     @commands.command(name="gettodo")
     async def get_todo(self, ctx: commands.Context):
@@ -96,7 +99,7 @@ class TodoHandler(commands.Cog):
             else:
                 string += f"Submitted by **{todo["sender"]}**: {todo["contents"]}\n"
         string.strip()
-        await interaction.response.send_message(string)
+        await interaction.response.send_message(string, silent=True)
 
 
 from utils import get_guilds
