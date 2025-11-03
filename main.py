@@ -53,9 +53,7 @@ def github_webhook():
         cha = bot.get_channel(1434918137173774397)  # Comtek p3 - github
 
         if cha:
-            asyncio.run_coroutine_threadsafe(
-                channel.send(message, silent=True), bot.loop
-            )
+            asyncio.run_coroutine_threadsafe(cha.send(message, silent=True), bot.loop)
     return "OK", 200
 
 
