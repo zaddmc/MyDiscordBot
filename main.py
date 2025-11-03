@@ -51,7 +51,7 @@ def github_webhook():
 
         cha = bot.get_channel(1425561165802770492)  # Server Usage - bot logs
         if cha:
-            asyncio.run_coroutine_threadsafe(channel.send(message), bot.loop)
+            asyncio.run_coroutine_threadsafe(cha.send(message), bot.loop)
     return "OK", 200
 
 
