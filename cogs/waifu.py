@@ -2,8 +2,12 @@ import random
 
 import discord
 import requests
-from discord import app_commands
+from discord import app_commands as ac
 from discord.ext import commands
+
+W2_SFW_TAGS = "waifu neko shinobu megumin cuddle cry hug awoo kiss lick pat smug bonk yeet blush smile wave highfive handhold nom bite happy wink poke dance".split()
+W2_OTHER = "bully glomp slap kill kick".split()
+W2_NSFW_TAGS = "waifu neko trap blowjob".split()
 
 
 class WaifuHandler(commands.Cog):
@@ -53,83 +57,49 @@ class WaifuHandler(commands.Cog):
         else:
             await ctx.send("Failed to get image")
 
-    @commands.command(name="waifu2")
-    async def get_waifu2(self, ctx: commands.Context, *args):
+    @ac.command(name="waifu2", description="Only choose one tag")
+    @ac.describe(sfw_tag="This is sfw", nsfw_tag="This is not sfw")
+    @ac.choices(
+        sfw_tag=[ac.Choice(name=t, value=t) for t in W2_SFW_TAGS],
+        nsfw_tag=[ac.Choice(name=t, value=t) for t in W2_NSFW_TAGS + W2_OTHER],
+    )
+    async def get_waifu2(
+        self,
+        interaction: discord.Interaction,
+        sfw_tag: ac.Choice[str] | None,
+        nsfw_tag: ac.Choice[str] | None,
+    ):
         """I am not proud of this function, it was commissioned by William Bjerglund"""
 
-        versatile_tag = [
-            "waifu",
-            "neko",
-            "shinobu",
-            "megumin",
-            "bully",
-            "cuddle",
-            "cry",
-            "hug",
-            "awoo",
-            "kiss",
-            "lick",
-            "pat",
-            "smug",
-            "bonk",
-            "yeet",
-            "blush",
-            "smile",
-            "wave",
-            "highfive",
-            "handhold",
-            "nom",
-            "bite",
-            "glomp",
-            "slap",
-            "kill",
-            "kick",
-            "happy",
-            "wink",
-            "poke",
-            "dance",
-        ]
-        nsfw_tag = [
-            "waifu",
-            "neko",
-            "trap",
-            "blowjob",
-        ]
+        is_channel_nsfw = getattr(interaction.channel, "is_nsfw", lambda: False)()
 
-        is_channel_nsfw = getattr(ctx.channel, "is_nsfw", lambda: False)()
-
-        all_tags = versatile_tag.copy()
+        all_tags = W2_SFW_TAGS.copy()
+        all_tags.extend(W2_OTHER.copy())
         if is_channel_nsfw:
-            all_tags.extend(nsfw_tag.copy())
+            all_tags.extend(W2_NSFW_TAGS.copy())
 
         is_tag_nsfw = False
         tag = None
-        for arg in args:
-            arg = arg.lower()
-            if tag == None and arg in all_tags:
-                tag = arg
-            if arg == "nsfw":
+        if sfw_tag:
+            tag = sfw_tag.value
+        elif nsfw_tag:
+            tag = nsfw_tag.value
+            if tag in W2_NSFW_TAGS:
                 is_tag_nsfw = True
         else:
-            if tag == None:
-                if is_tag_nsfw:
-                    tag = random.choice(nsfw_tag)
-                else:
-                    tag = random.choice(versatile_tag)
-
-        if tag in nsfw_tag and not is_tag_nsfw and tag not in versatile_tag:
-            is_tag_nsfw = True
+            print("Unforseen tag")
+            tag = "waifu"
 
         url = f"https://api.waifu.pics/{"nsfw" if is_tag_nsfw else "sfw"}/{tag}"
-        print(url)
 
         response = requests.get(url)
 
         if response.status_code == 200:
             data = response.json()
-            await ctx.send(data["url"])
+            print(interaction.user.name, url, data["url"])
+            await interaction.response.send_message(data["url"])
         else:
-            await ctx.send("Failed to get image")
+            await interaction.response.send_message("Failed to get image")
 
     @commands.command(name="joke")
     async def get_joke(self, ctx: commands.Context):
