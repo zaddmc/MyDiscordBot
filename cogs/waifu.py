@@ -93,10 +93,11 @@ class WaifuHandler(commands.Cog):
         url = f"https://api.waifu.pics/{"nsfw" if is_tag_nsfw else "sfw"}/{tag}"
 
         response = requests.get(url)
+        cha = self.bot.get_channel(1425561165802770492)  # Server Usage - bot logs
 
         if response.status_code == 200:
             data = response.json()
-            print(interaction.user.name, url, data["url"])
+            cha.send(interaction.user.name, url, data["url"])
             await interaction.response.send_message(data["url"])
         else:
             await interaction.response.send_message("Failed to get image")
