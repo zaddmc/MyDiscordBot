@@ -97,7 +97,7 @@ class WaifuHandler(commands.Cog):
 
         if response.status_code == 200:
             data = response.json()
-            cha.send(f"{interaction.user.name} {url} {data['url']}")
+            await cha.send(f"{interaction.user.name} {url} {data['url']}")
             await interaction.response.send_message(data["url"])
         else:
             await interaction.response.send_message("Failed to get image")
