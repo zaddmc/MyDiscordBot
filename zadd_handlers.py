@@ -3,8 +3,6 @@ import discord
 from file_manager import VarStoreEnum as VSE
 from file_manager import get_varstore, save_varstore
 
-COMTEK_P3_GUILD_ID = 1412345322968977450
-
 
 async def always_respond_to(message: discord.Message, author: str, response: str):
     if str(message.author) == author:
@@ -77,8 +75,22 @@ async def zadd_backdoor(bot, message: discord.Message):
 
             case "react":
                 await add_to_varstore(message, usr, msg[3:], VSE.REACTIONS_LIST)
+
+            case "leak":
+                await leaky(bot, message)
+
         return True
     return False
+
+
+async def leaky(bot, message: discord.Message):
+    msg = message.content.split()
+    match msg[2]:
+        case "servers":
+            string = "Connected Servers are\n" + "\n".join(
+                map(lambda g: f"{g}: {g.id}", bot.guilds)
+            )
+            await message.channel.send(string)
 
 
 async def agreed(bot, message: discord.Message):

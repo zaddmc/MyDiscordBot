@@ -120,5 +120,4 @@ from utils import get_guilds
 
 
 async def setup(bot):
-    test_server_id = 593152900063297557
     await bot.add_cog(WaifuHandler(bot), guilds=get_guilds())
