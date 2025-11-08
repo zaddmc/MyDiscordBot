@@ -92,6 +92,33 @@ async def leaky(bot, message: discord.Message):
             )
             await message.channel.send(string)
 
+        case "channels":
+            if len(msg) != 4:
+                await message.channel.send("Not correct amount of arguments")
+                return
+            if not msg[3].isdigit():
+                await message.channel.send("Not a valid entry: " + msg[3])
+                return
+
+            guild = await bot.fetch_guild(int(msg[3]))
+            channels = await guild.fetch_channels()
+            await message.channel.send(
+                "Available channels are:\n"
+                + "\n".join(map(lambda s: f"{s.name}: {s.id}", channels))
+            )
+
+        case "send":
+            if len(msg) < 5:
+                await message.channel.send("Not correct amount of arguments")
+                return
+            if not msg[3].isdigit():
+                await message.channel.send("Not a valid entry: " + msg[3])
+                return
+
+            channel = await bot.fetch_channel(int(msg[3]))
+            await channel.send(" ".join(msg[4:]))
+            await message.add_reaction("✅")  # Why cant i use the discord syntax
+
 
 async def agreed(bot, message: discord.Message):
     msg = message.content.split()

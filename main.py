@@ -7,15 +7,18 @@ from dotenv import load_dotenv
 
 import zadd_handlers as zh
 from file_manager import VarStoreEnum, get_varstore
-from utils import get_guilds
+from utils import get_guilds, init
 
 
 class MyBot(commands.Bot):
     async def setup_hook(self):
+        await init(self)
+
         await self.load_extension("cogs.voice")
         await self.load_extension("cogs.todo")
         await self.load_extension("cogs.meet")
         await self.load_extension("cogs.waifu")
+        await self.load_extension("cogs.backdoor")
 
 
 intents = discord.Intents.default()
@@ -32,11 +35,6 @@ async def on_ready():
     for g in get_guilds():
         await bot.tree.sync(guild=g)
     print("I am ready to fight")
-
-
-@bot.tree.command(name="hell", description="I am dis")
-async def slash_command(interaction: discord.Interaction):
-    await interaction.response.send_message("Command")
 
 
 @bot.event
