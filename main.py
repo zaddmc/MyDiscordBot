@@ -26,7 +26,7 @@ intents.message_content = True
 intents.voice_states = True
 intents.members = True
 
-
+global bot
 bot = MyBot(command_prefix="!", intents=intents)
 
 

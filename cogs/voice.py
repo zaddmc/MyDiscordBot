@@ -5,6 +5,7 @@ from time import sleep
 import discord
 from discord.ext import commands
 
+import main
 from file_manager import get_filename
 
 
@@ -17,7 +18,7 @@ class Voice(commands.Cog):
     async def hello(self, ctx: commands.Context):
         await ctx.send(f"Hello {ctx.author.mention}")
 
-    @self.bot.event
+    @main.bot.event
     async def on_voice_state_update(member, before, after: discord.VoiceState):
         if str(member) == str(bot.user):
             return
