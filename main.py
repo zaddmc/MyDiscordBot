@@ -38,23 +38,6 @@ async def on_ready():
 
 
 @bot.event
-async def on_voice_state_update(member, before, after: discord.VoiceState):
-    if str(member) == str(bot.user):
-        return
-    if not (before.channel is None and after.channel):
-        return
-    channel: discord.VoiceChannel = after.channel
-
-    await channel.connect()
-    # Play Martin er en uran hjort
-    after.channel.guild.voice_client.play(
-        discord.FFmpegPCMAudio(
-            executable="ffmpeg", source="songs/intro_song_martin.mp3"
-        )
-    )
-
-
-@bot.event
 async def on_message(message: discord.Message):
     if message.author == bot.user:
         return

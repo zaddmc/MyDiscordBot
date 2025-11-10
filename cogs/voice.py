@@ -1,4 +1,6 @@
 import os
+import random
+from time import sleep
 
 import discord
 from discord.ext import commands
@@ -9,10 +11,34 @@ from file_manager import get_filename
 class Voice(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.playing = False
 
     @commands.command(name="hello")
     async def hello(self, ctx: commands.Context):
         await ctx.send(f"Hello {ctx.author.mention}")
+
+    @self.bot.event
+    async def on_voice_state_update(member, before, after: discord.VoiceState):
+        if str(member) == str(bot.user):
+            return
+        if not (before.channel is None and after.channel):
+            return
+        channel: discord.VoiceChannel = after.channel
+
+        await channel.connect()
+        self.playing = True
+
+        while self.playing:
+            self.play_martin_song(after)
+            sleep(random.randint(120, 600))
+
+    def play_martin_song(after):
+        # Play Martin er en uran hjort
+        after.channel.guild.voice_client.play(
+            discord.FFmpegPCMAudio(
+                executable="ffmpeg", source="songs/intro_song_martin.mp3"
+            )
+        )
 
     @commands.command(name="join", help="Tells the bot to join your vc")
     async def join(self, ctx):
@@ -35,6 +61,7 @@ class Voice(commands.Cog):
     async def leave(self, ctx):
         voice_client = ctx.message.guild.voice_client
         if voice_client.is_connected():
+            self.playing = False
             await voice_client.disconnect()
         else:
             await ctx.send("The bot is not connected to a voice channel")
