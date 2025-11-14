@@ -57,6 +57,18 @@ class WaifuHandler(commands.Cog):
         else:
             await ctx.send("Failed to get image")
 
+    @ac.command(
+        name="summonwilliam", description="Gurateed to summon william within 2 min"
+    )
+    async def william101(self, intr: discord.Interaction):
+        url = "https://api.waifu.pics/nsfw/trap"
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            await intr.response.send_message(data["url"])
+        else:
+            await intr.response.send_message("Failed to get image")
+
     @ac.command(name="waifu2", description="Only choose one tag")
     @ac.describe(sfw_tag="This is sfw", nsfw_tag="This is not sfw")
     @ac.choices(
