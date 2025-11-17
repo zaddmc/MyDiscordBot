@@ -41,8 +41,6 @@ async def on_ready():
 async def on_message(message: discord.Message):
     if message.author == bot.user:
         return
-    if str(message.channel) in ["udviklings-kanal"]:
-        return
 
     if await zh.zadd_backdoor(bot, message) or await zh.agreed(bot, message):
         return
