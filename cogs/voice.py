@@ -68,7 +68,9 @@ class Voice(commands.Cog):
             await ctx.send("The bot is not connected to a voice channel")
 
     @commands.command(name="play", help="gib url to play")
-    async def play(self, ctx, url):
+    async def play(self, ctx, url: str):
+        if "&list" in url:
+            url = url[: url.index("&list")]
         try:
             server = ctx.message.guild
             voice_channel = server.voice_client
