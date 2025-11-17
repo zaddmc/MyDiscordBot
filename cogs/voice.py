@@ -69,8 +69,11 @@ class Voice(commands.Cog):
 
     @commands.command(name="play", help="gib url to play")
     async def play(self, ctx, url: str):
-        if "&list" in url:
-            url = url[: url.index("&list")]
+        # Remove stupid tags
+        for tag in ["&list", "&pp"]:
+            if tag in url:
+                url = url[: url.index(tag)]
+
         try:
             server = ctx.message.guild
             voice_channel = server.voice_client
