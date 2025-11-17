@@ -79,7 +79,8 @@ class Voice(commands.Cog):
                     discord.FFmpegPCMAudio(executable="ffmpeg", source=filename)
                 )
             await ctx.send("**Now playing:**")
-        except:
+        except Exception as e:
+            print("Error in play command", e)
             await ctx.send("The bot is not connected to a voice channel.")
 
     @commands.command(name="pause", help="This command pauses the song")
