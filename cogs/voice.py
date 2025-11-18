@@ -22,10 +22,6 @@ class Voice(commands.Cog):
             )
         )
 
-    @commands.command(name="join", help="DEPRECATED")
-    async def join(self, ctx: commands.Context):
-        await ctx.send("This function is deprecated by **/join**")
-
     @ac.command(name="join", description="Tells the bot to join your vc")
     async def join(self, intr: discord.Interaction):
         respond = intr.response.send_message  # Just an alias
@@ -41,10 +37,6 @@ class Voice(commands.Cog):
             # Play Martin er en uran hjort
             self.play_martin_song(intr.guild.voice_client)
 
-    @commands.command(name="leave", help="DEPRECATED")
-    async def leave(self, ctx: commands.Context):
-        await ctx.send("DEPRECATED, use /leave")
-
     @ac.command(name="leave", description="Make the bot leave")
     async def leave(self, intr: discord.Interaction):
         respond = intr.response.send_message  # Just an alias
@@ -54,10 +46,6 @@ class Voice(commands.Cog):
             await respond("Bot has left", silent=True)
         else:
             await respond("Bot is not connected", ephemeral=True)
-
-    @commands.command(name="play", help="DEPRECATED")
-    async def play(self, ctx: commands.Context):
-        ctx.send("DEPRECATED, use /play url")
 
     @ac.command(name="play", description="Give url to play")
     @ac.describe(url="A youtube url")
@@ -94,10 +82,6 @@ class Voice(commands.Cog):
             await ctx.send(
                 "The bot was not playing anything before this. Use play_song command"
             )
-
-    @commands.command(name="stop", help="DEPRECATED")
-    async def stop(self, ctx: commands.Context):
-        ctx.send("DEPRECATED, use /stop")
 
     @ac.command(name="stop", description="Stops playing")
     async def stop(self, intr: discord.Interaction):
