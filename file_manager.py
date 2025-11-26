@@ -91,7 +91,7 @@ def make_todo(
         "sender_id": sender_id,
         "target": target,
         "target_id": target_id,
-        "server": server,
+        "server": server_id,
     }
 
 
