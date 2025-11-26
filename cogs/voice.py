@@ -51,6 +51,11 @@ class Voice(commands.Cog):
     @ac.describe(url="A youtube url")
     async def play(self, intr: discord.Interaction, url: str):
         respond = intr.response.send_message  # Just an alias
+        if url == "martin":
+            play_martin_song(intr.guild.voice_client)
+            await respond("**Now Playing:** Martin er en uran hjort", silent=True)
+            return
+
         # Clean Url
         for tag in ["&list", "&pp"]:
             if tag in url:

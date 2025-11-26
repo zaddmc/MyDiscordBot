@@ -77,8 +77,22 @@ def save_varstore(mydict: dict, target: VarStoreEnum) -> None:
         file.write(str(mydict))
 
 
-def make_todo(contents: str, sender: str, target: str):
-    return {"contents": contents, "sender": sender, "target": target}
+def make_todo(
+    contents: str,
+    sender: str,
+    sender_id: int,
+    target: str,
+    target_id: int,
+    server_id: int,
+):
+    return {
+        "contents": contents,
+        "sender": sender,
+        "sender_id": sender_id,
+        "target": target,
+        "target_id": target_id,
+        "server": server,
+    }
 
 
 def get_todos() -> dict:

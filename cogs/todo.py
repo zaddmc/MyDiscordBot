@@ -1,4 +1,6 @@
 import datetime
+import os
+import subprocess
 
 import discord
 from discord import app_commands
@@ -13,20 +15,32 @@ class TodoHandler(commands.Cog):
 
     @app_commands.command(name="addtodo", description="Add a todo")
     @app_commands.describe(
-        contents="The contents of the todo", target="Who to target with command"
+        contents="The contents of the todo",
+        target="Who to target with command",
+        notify="Give a time that is compatible with the command 'at'\nIf not, then get fucked",
     )
     async def add_todo(
         self,
         interaction: discord.Interaction,
         contents: str,
-        target: discord.Member,
+        target: discord.Member | None,
+        notify: str | None,
     ):
         todos = get_todos()
-        todo = make_todo(contents, interaction.user.name, target.name)
+        if not target:
+            target = interaction.user
+        todo = make_todo(
+            contents,
+            interaction.user.name,
+            interaction.user.id,
+            target.name,
+            target.id,
+            interaction.guild_id,
+        )
         todos["incomplete"].append(todo)
         save_todos(todos)
         await interaction.response.send_message(
-            f"Todo intended for **{todo['target']}**: {todo['contents']}\nWas Succesfully added",
+            f"Todo for **{todo['target']}**: {todo['contents']}",
             silent=True,
         )
 

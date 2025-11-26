@@ -1,5 +1,7 @@
 import os
+import signal
 import subprocess
+import sys
 
 import discord
 from discord.ext import commands, tasks
@@ -28,6 +30,13 @@ intents.members = True
 
 global bot
 bot = MyBot(command_prefix="!", intents=intents)
+
+
+def signal_handler(sig, frame):
+    print("Signal recived")
+
+
+signal.signal(signal.SIGUSR1, signal_handler)
 
 
 @bot.event
