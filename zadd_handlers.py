@@ -126,3 +126,11 @@ async def agreed(bot, message: discord.Message):
         await message.channel.send("Definitely")
         return True
     return False
+
+
+async def microslop(bot, message: discord.Message):
+    msg = message.content.lower()
+    if "microsoft" in msg:
+        await message.channel.send("Eww, dont mention greedy microslop in this server")
+        return True
+    return False

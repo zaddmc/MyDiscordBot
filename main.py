@@ -51,7 +51,11 @@ async def on_message(message: discord.Message):
     if message.author == bot.user:
         return
 
-    if await zh.zadd_backdoor(bot, message) or await zh.agreed(bot, message):
+    if (
+        await zh.zadd_backdoor(bot, message)
+        or await zh.agreed(bot, message)
+        or await zh.microslop(bot, message)
+    ):
         return
 
     await zh.always_react_to_list(message)
