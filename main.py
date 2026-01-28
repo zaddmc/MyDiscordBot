@@ -1,5 +1,4 @@
 import os
-import signal
 import subprocess
 import sys
 
@@ -21,6 +20,7 @@ class MyBot(commands.Bot):
         await self.load_extension("cogs.meet")
         await self.load_extension("cogs.waifu")
         await self.load_extension("cogs.backdoor")
+        await self.load_extension("cogs.minecraft")
 
 
 intents = discord.Intents.default()
@@ -30,13 +30,6 @@ intents.members = True
 
 global bot
 bot = MyBot(command_prefix="!", intents=intents)
-
-
-def signal_handler(sig, frame):
-    print("Signal recived")
-
-
-signal.signal(signal.SIGUSR1, signal_handler)
 
 
 @bot.event

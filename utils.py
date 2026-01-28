@@ -1,3 +1,5 @@
+import os
+
 import discord
 
 
@@ -18,3 +20,8 @@ def get_guilds() -> list[discord.Guild]:
         discord.Object(id=1412345322968977450),  # Comtekp3
         discord.Object(id=1425443931319046195),  # REPO -- William
     ]
+
+
+def get_server_ip() -> str:
+    """Remember to not give away critical things like IPs"""
+    return os.getenv("MINECRAFT_IP")
