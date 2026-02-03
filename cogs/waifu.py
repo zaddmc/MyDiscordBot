@@ -1,3 +1,4 @@
+import json
 import random
 
 import discord
@@ -135,8 +136,8 @@ class WaifuHandler(commands.Cog):
         response = requests.get(url)
 
         if response.status_code == 200:
-            data = response.content
-            await respond(data)
+            data = json.loads(response.content)
+            await respond(data["data"]["content"])
         else:
             await respond("rimuru is best GIRL")
 
