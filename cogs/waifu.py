@@ -127,6 +127,19 @@ class WaifuHandler(commands.Cog):
         else:
             await ctx.send("You...")
 
+    @ac.command(name="waifu_quote", description="Simple anime quotes")
+    async def get_waifu_quote(self, intr: discord.Interaction):
+        respond = intr.response.send_message
+        url = "https://api.animechan.io/v1/quotes/random"
+
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.content
+            await respond(data)
+        else:
+            await respond("rimuru is best GIRL")
+
 
 from utils import get_guilds
 
