@@ -136,7 +136,11 @@ class WaifuHandler(commands.Cog):
         response = requests.get(url)
 
         if response.status_code == 200:
-            data = json.loads(response.content)
+            data = json.loads(response.content)["data"]
+            quote = data["content"]
+            person = data["character"]["name"]
+            anime = data["anime"]["name"]
+            string = f"*{quote}*\n - {person} -- {anime}"
             await respond(data["data"]["content"])
         else:
             await respond("rimuru is best GIRL")
