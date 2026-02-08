@@ -1,3 +1,4 @@
+import logging
 import os
 import subprocess
 import sys
@@ -9,6 +10,8 @@ from dotenv import load_dotenv
 import zadd_handlers as zh
 from file_manager import VarStoreEnum, get_varstore
 from utils import get_guilds, init
+
+lg = logging.getLogger(__name__)
 
 
 class MyBot(commands.Bot):
@@ -36,7 +39,7 @@ bot = MyBot(command_prefix="!", intents=intents)
 async def on_ready():
     for g in get_guilds():
         await bot.tree.sync(guild=g)
-    print("I am ready to fight")
+    lg.info("Bot is ready to rumble")
 
 
 @bot.event
@@ -67,4 +70,4 @@ if __name__ == "__main__":
     load_dotenv()
     DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 
-    bot.run(DISCORD_TOKEN)
+    bot.run(DISCORD_TOKEN, root_logger=True)

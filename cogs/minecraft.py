@@ -1,3 +1,5 @@
+import logging
+
 import discord
 from discord import app_commands as ac
 from discord.ext import commands, tasks
@@ -6,19 +8,23 @@ from mcstatus import JavaServer
 import utils
 from utils import get_guilds
 
+lg = logging.getLogger(__name__)
+
 
 class Minecraft(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
         self.server: JavaServer = JavaServer.lookup(utils.get_server_ip())
+        self.task_update_status.start()
 
     def cog_unload(self):
+        lg.info("Stopping cog Minecraft")
         self.task_update_status.cancel()
 
     async def update_status(self):
         players = self.server.status().players.online
 
-        print("Updating status ", players)
+        lg.info(f"Updating status cur {players}")
 
         if players:
             activity = discord.Game(name=f"{players} Players")
@@ -33,6 +39,7 @@ class Minecraft(commands.Cog):
     @task_update_status.before_loop
     async def before_task_update_status(self):
         await self.bot.wait_until_ready()
+        lg.info("Starting auto status updater")
 
     @ac.command(name="update_status", description="manually start updating status")
     async def manual_update_status(self, intr: discord.Interaction):
