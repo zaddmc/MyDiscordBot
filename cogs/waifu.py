@@ -140,7 +140,7 @@ class WaifuHandler(commands.Cog):
             quote = data["content"]
             person = data["character"]["name"]
             anime = data["anime"]["name"]
-            string = f"*{quote}*\n - {person} -- {anime}"
+            string = f"*{quote}* -{person} -- {anime}"
             await respond(string)
         else:
             await respond("rimuru is best GIRL")
