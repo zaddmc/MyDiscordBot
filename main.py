@@ -24,6 +24,7 @@ class MyBot(commands.Bot):
         await self.load_extension("cogs.waifu")
         await self.load_extension("cogs.backdoor")
         await self.load_extension("cogs.minecraft")
+        await self.load_extension("cogs.gambling")
 
 
 intents = discord.Intents.default()
