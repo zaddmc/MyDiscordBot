@@ -6,6 +6,8 @@ import requests
 from discord import app_commands as ac
 from discord.ext import commands
 
+import utils
+
 W2_SFW_TAGS = "waifu neko shinobu megumin cuddle cry hug awoo kiss lick pat smug bonk yeet blush smile wave highfive handhold nom bite happy wink poke dance".split()
 W2_OTHER = "bully glomp slap kill kick".split()
 W2_NSFW_TAGS = "waifu neko trap blowjob".split()
@@ -64,6 +66,9 @@ class WaifuHandler(commands.Cog):
     async def william101(self, intr: discord.Interaction):
         url = "https://api.waifu.pics/nsfw/trap"
         response = requests.get(url)
+
+        await utils.william.send(f"You have been summoned in {intr.channel.name}")
+
         if response.status_code == 200:
             data = response.json()
             await intr.response.send_message(data["url"])
@@ -95,7 +100,7 @@ class WaifuHandler(commands.Cog):
         tag = None
         if sfw_tag:
             tag = sfw_tag.value
-        elif nsfw_tag:
+        elif nsfw_tag and is_channel_nsfw:
             tag = nsfw_tag.value
             if tag in W2_NSFW_TAGS:
                 is_tag_nsfw = True
