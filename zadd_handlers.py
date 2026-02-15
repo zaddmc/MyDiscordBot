@@ -124,13 +124,16 @@ async def agreed(bot, message: discord.Message):
     msg = message.content.split()
     if message.content.startswith("fish"):
         await message.channel.send("Definitely")
-        return True
-    return False
 
 
 async def microslop(bot, message: discord.Message):
     msg = message.content.lower()
     if "microsoft" in msg:
-        await message.channel.send("Eww, dont mention greedy microslop in this server")
-        return True
-    return False
+        await message.reply("Eww, dont mention greedy microslop in this server")
+
+
+async def nogipity(bot, message: discord.Message):
+    if "?utm_source=chatgpt.com" in message.content:
+        await message.reply(
+            "broo, don't include chat gipity as a source\nsanitize your sources"
+        )
