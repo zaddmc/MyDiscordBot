@@ -31,6 +31,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.voice_states = True
 intents.members = True
+intents
 
 global bot
 bot = MyBot(command_prefix="!", intents=intents)
@@ -52,6 +53,7 @@ async def on_message(message: discord.Message):
     await zh.agreed(bot, message)
     await zh.microslop(bot, message)
     await zh.nogipity(bot, message)
+    await zh.delete(bot, message)
 
     await zh.always_react_to_list(message)
     await zh.always_respond_to_list(message)
@@ -63,6 +65,25 @@ async def on_message(message: discord.Message):
         )
     # This line should be last to process the commands as specified in class MyBot
     await bot.process_commands(message)
+
+
+@bot.event
+async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
+    if payload.emoji.name != "❌":
+        return
+    if payload.message_author_id != bot.user.id:
+        return
+
+    channel = bot.get_channel(payload.channel_id)
+    if channel is None:
+        channel = await bot.fetch_channel(payload.channel_id)
+
+    message = await channel.fetch_message(payload.message_id)
+
+    cha = bot.get_channel(1425561165802770492)  # Server Usage - bot logs
+    await cha.send(content="This has been deleted:\n" + message.content)
+
+    await message.delete()
 
 
 if __name__ == "__main__":

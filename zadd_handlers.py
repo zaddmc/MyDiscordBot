@@ -137,3 +137,28 @@ async def nogipity(bot, message: discord.Message):
         await message.reply(
             "broo, don't include chat gipity as a source\nsanitize your sources"
         )
+
+
+async def delete(bot, message: discord.Message):
+    if message.content != "delete":
+        return
+    if message.reference == None:
+        return
+
+    other: discord.MessageReference = message.reference
+    channel = bot.get_channel(other.channel_id)
+    if channel is None:
+        channel = bot.fetch_channel(other.channel_id)
+    other_message: discord.Message = await channel.fetch_message(other.message_id)
+
+    if other_message.author.id != bot.user.id:
+        return
+
+    cha = bot.get_channel(1425561165802770492)  # Server Usage - bot logs
+    await cha.send(content="This has been deleted:\n" + other_message.content)
+
+    await other_message.delete()
+
+    if not message.author.guild_permissions.manage_messages:
+        return
+    await message.delete()
