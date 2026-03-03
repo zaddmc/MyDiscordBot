@@ -2,11 +2,10 @@ import logging
 
 import a2s
 import discord
+import utils
 from discord import app_commands as ac
 from discord.ext import commands, tasks
 from mcstatus import JavaServer
-
-import utils
 from utils import get_guilds
 
 lg = logging.getLogger(__name__)
@@ -24,8 +23,15 @@ class Minecraft(commands.Cog):
         self.task_update_status.cancel()
 
     async def update_status(self):
-        mc_players = self.mc_server.status().players.online
-        se_players = a2s.info(self.se_addr, timeout=3).player_count
+        try:
+            mc_players = self.mc_server.status().players.online
+        except:
+            mc_players = 0
+
+        try:
+            se_players = a2s.info(self.se_addr, timeout=3).player_count
+        except:
+            se_players = 0
 
         lg.info(
             f"Updating status cur {mc_players} in minecraft and {se_players} in space"
