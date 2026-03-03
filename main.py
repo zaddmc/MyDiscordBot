@@ -25,6 +25,7 @@ class MyBot(commands.Bot):
         await self.load_extension("cogs.backdoor")
         await self.load_extension("cogs.minecraft")
         await self.load_extension("cogs.gambling")
+        await self.load_extension("cogs.stuff")
 
 
 intents = discord.Intents.default()
