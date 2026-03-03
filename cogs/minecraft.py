@@ -1,5 +1,6 @@
 import logging
 
+import a2s
 import discord
 from discord import app_commands as ac
 from discord.ext import commands, tasks
@@ -14,7 +15,8 @@ lg = logging.getLogger(__name__)
 class Minecraft(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
-        self.server: JavaServer = JavaServer.lookup(utils.get_server_ip())
+        self.mc_server: JavaServer = JavaServer.lookup(utils.get_server_ip())
+        self.se_addr: tuple[str, int] = ("127.0.0.1", 27912)
         self.task_update_status.start()
 
     def cog_unload(self):
@@ -22,9 +24,14 @@ class Minecraft(commands.Cog):
         self.task_update_status.cancel()
 
     async def update_status(self):
-        players = self.server.status().players.online
+        mc_players = self.mc_server.status().players.online
+        se_players = a2s.info(self.se_addr, timeout=3).player_count
 
-        lg.info(f"Updating status cur {players}")
+        lg.info(
+            f"Updating status cur {mc_players} in minecraft and {se_players} in space"
+        )
+
+        players = max(mc_players, se_players)
 
         if players:
             activity = discord.Game(name=f"{players} Players")
@@ -53,7 +60,7 @@ class Minecraft(commands.Cog):
     async def get_players(self, intr: discord.Interaction):
         respond = intr.response.send_message
 
-        status = self.server.status().players
+        status = self.mc_server.status().players
         respone = f"There is currently {status.online} player in game"
         if status.online:
             for player in status.sample:
