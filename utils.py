@@ -17,7 +17,7 @@ async def init(ebot: discord.ext.commands.Bot):
     william = await bot.fetch_user(204260790822240257)  # William
 
 
-def get_guilds() -> list[discord.Guild]:
+def get_guilds() -> list[discord.Object]:
     return [
         discord.Object(id=593152900063297557),  # Server-usage
         discord.Object(id=1467808520169586722),  # ComTekHU18

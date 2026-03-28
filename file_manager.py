@@ -1,4 +1,5 @@
 import os
+import uuid
 
 import yt_dlp
 
@@ -84,6 +85,7 @@ def make_todo(
     target: str,
     target_id: int,
     server_id: int,
+    l_uuid: str | None = None,
 ):
     return {
         "contents": contents,
@@ -92,6 +94,7 @@ def make_todo(
         "target": target,
         "target_id": target_id,
         "server": server_id,
+        "uuid": l_uuid if l_uuid else str(uuid.uuid4()),
     }
 
 
@@ -103,7 +106,14 @@ def get_todos() -> dict:
 
     with open(file_path, "r") as file:
         data = file.read()
-    return eval(data)
+    return eval(data, {"UUID": uuid.UUID})
+
+
+def get_todo(t_uuid: str) -> dict | None:
+    todos = get_todos()
+    for todo in todos["complete"] + todos["incomplete"]:
+        if todo["uuid"] == t_uuid:
+            return todo
 
 
 def save_todos(todos: dict) -> None:

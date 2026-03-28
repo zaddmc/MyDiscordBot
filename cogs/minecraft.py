@@ -34,11 +34,9 @@ class Minecraft(commands.Cog):
         except:
             se_players = 0
 
-        lg.info(
-            f"Updating status cur {mc_players} in minecraft and {se_players} in space"
-        )
+        lg.info(f"Updating status cur {mc_players} in minecraft and {se_players} in space")
 
-        players = sum(mc_players, se_players)
+        players = sum([mc_players, se_players])
         if mc_players != 0 and se_players != 0:
             game = "MC+SE"
         elif mc_players != 0:
@@ -47,10 +45,8 @@ class Minecraft(commands.Cog):
             game = "SE"
 
         if players:
-            activity = discord.Game(name=game)
-            await self.bot.change_presence(
-                activity=activity, status=f"{players} Playing"
-            )
+            activity = discord.Game(name=f"{players} Playing {game}")
+            await self.bot.change_presence(activity=activity)
         else:
             await self.bot.change_presence(activity=None)
 
@@ -69,9 +65,7 @@ class Minecraft(commands.Cog):
         await self.update_status()
         await respond("Updated the status", ephemeral=True)
 
-    @ac.command(
-        name="get_players", description="Get current players in Minecraft Server"
-    )
+    @ac.command(name="get_players", description="Get current players in Minecraft Server")
     async def get_players(self, intr: discord.Interaction):
         respond = intr.response.send_message
 

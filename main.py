@@ -32,9 +32,8 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.voice_states = True
 intents.members = True
-intents
 
-global bot
+
 bot = MyBot(command_prefix="!", intents=intents)
 
 
@@ -61,9 +60,7 @@ async def on_message(message: discord.Message):
 
     if message.content.startswith("echo"):
         print("Recieved:", message.content.split())
-        await message.channel.send(
-            subprocess.check_output(message.content.split()).decode("utf-8").strip()
-        )
+        await message.channel.send(subprocess.check_output(message.content.split()).decode("utf-8").strip())
     # This line should be last to process the commands as specified in class MyBot
     await bot.process_commands(message)
 
@@ -72,17 +69,19 @@ async def on_message(message: discord.Message):
 async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
     if payload.emoji.name != "❌":
         return
-    if payload.message_author_id != bot.user.id:
+    if bot.user and payload.message_author_id != bot.user.id:
         return
 
     channel = bot.get_channel(payload.channel_id)
     if channel is None:
         channel = await bot.fetch_channel(payload.channel_id)
 
-    message = await channel.fetch_message(payload.message_id)
+    if isinstance(channel, discord.TextChannel):
+        message = await channel.fetch_message(payload.message_id)
 
     cha = bot.get_channel(1425561165802770492)  # Server Usage - bot logs
-    await cha.send(content="This has been deleted:\n" + message.content)
+    if isinstance(cha, discord.TextChannel):
+        await cha.send(content=f"This has been deleted by {message.author}:\n" + message.content)
 
     await message.delete()
 
@@ -90,5 +89,5 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
 if __name__ == "__main__":
     load_dotenv()
     DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-
-    bot.run(DISCORD_TOKEN, root_logger=True)
+    if DISCORD_TOKEN:
+        bot.run(DISCORD_TOKEN, root_logger=True)
