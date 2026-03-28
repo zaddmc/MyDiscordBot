@@ -2,10 +2,11 @@ import logging
 
 import a2s
 import discord
-import utils
 from discord import app_commands as ac
 from discord.ext import commands, tasks
 from mcstatus import JavaServer
+
+import utils
 from utils import get_guilds
 
 lg = logging.getLogger(__name__)
@@ -37,11 +38,19 @@ class Minecraft(commands.Cog):
             f"Updating status cur {mc_players} in minecraft and {se_players} in space"
         )
 
-        players = max(mc_players, se_players)
+        players = sum(mc_players, se_players)
+        if mc_players != 0 and se_players != 0:
+            game = "MC+SE"
+        elif mc_players != 0:
+            game = "MC"
+        elif se_players != 0:
+            game = "SE"
 
         if players:
-            activity = discord.Game(name=f"{players} Players")
-            await self.bot.change_presence(activity=activity)
+            activity = discord.Game(name=game)
+            await self.bot.change_presence(
+                activity=activity, status=f"{players} Playing"
+            )
         else:
             await self.bot.change_presence(activity=None)
 
@@ -66,13 +75,16 @@ class Minecraft(commands.Cog):
     async def get_players(self, intr: discord.Interaction):
         respond = intr.response.send_message
 
-        status = self.mc_server.status().players
-        respone = f"There is currently {status.online} player in game"
-        if status.online:
-            for player in status.sample:
-                respone += f"\n- {player.name}"
+        try:
+            status = self.mc_server.status().players
+            respone = f"There is currently {status.online} player in game"
+            if status.online:
+                for player in status.sample:
+                    respone += f"\n- {player.name}"
 
-        await respond(respone)
+            await respond(respone)
+        except:
+            await respond("Server is currently Down")
 
 
 async def setup(bot: commands.Bot):
