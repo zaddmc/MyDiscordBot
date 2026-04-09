@@ -83,7 +83,6 @@ class TodoHandler(commands.Cog):
     async def todo_autocomplete(self, intr: discord.Interaction, current: str) -> List[ac.Choice[str]]:
         todos = get_todos()["incomplete"]
         todos = list(filter(lambda x: x["target"] == intr.user.name, todos))
-        lg.info(todos)
         return [
             ac.Choice(name=todo["contents"], value=todo["uuid"])
             for todo in todos
@@ -102,6 +101,7 @@ class TodoHandler(commands.Cog):
             return
         todos["incomplete"].remove(tod)
         todos["complete"].append(tod)
+        save_todos(todos)
         await respond(f"Marked **{tod['contents']}** As Finished")
 
     # Get Todos
