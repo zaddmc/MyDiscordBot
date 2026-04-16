@@ -71,7 +71,7 @@ class TodoHandler(commands.Cog):
         if not todo:
             await respond("Failed to find Todo", ephemeral=True)
             return
-        todo.State = TodoStateEnum(mark_as) if mark_as else TodoStateEnum.SUCCES
+        todo.State = TodoStateEnum(mark_as.value) if mark_as else TodoStateEnum.SUCCES
         save_modded_todo(todo)
         await respond(f"Marked **{todo.Content}** As **{todo.State.value}**")
 
