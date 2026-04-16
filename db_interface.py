@@ -12,10 +12,10 @@ if not con:
     cur = con.cursor()
     try:
         if "todo" not in cur.execute("SELECT name FROM sqlite_master").fetchone():
-            cur.execute("CREATE TABLE todo(target, sender, content, priority, state, uuid)")
+            cur.execute("CREATE TABLE todo(target, sender, content, state, uuid)")
     except Exception as e:
         lg.error(f"Failed to instantiate table: {e}")
-        cur.execute("CREATE TABLE todo(target, sender, content, priority, state, uuid)")
+        cur.execute("CREATE TABLE todo(target, sender, content, state, uuid)")
 
 
 class TodoStateEnum(Enum):
