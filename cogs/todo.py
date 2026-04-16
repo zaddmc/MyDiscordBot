@@ -9,129 +9,110 @@ import discord
 from discord import app_commands as ac
 from discord.ext import commands
 
-from file_manager import get_todo, get_todos, make_todo, save_todos
+# from file_manager import Todo, get_todo, get_todos, save_todos
+from db_interface import Todo, TodoStateEnum, add_todo, get_todo, get_todos, save_modded_todo
 
 lg = logging.getLogger(__name__)
 
 
 class TodoHandler(commands.Cog):
     def __init__(self, bot):
-        self.bot: discord.Bot = bot
+        self.bot: commands.Bot = bot
 
     @ac.command(name="addtodo", description="Add a todo")
     @ac.describe(
         contents="The contents of the todo",
         target="Who to target with command",
-        notify="Give a time that is compatible with the command 'at'\nIf not, then get fucked",
     )
-    async def add_todo(
+    async def m_add_todo(
         self,
         interaction: discord.Interaction,
         contents: str,
         target: discord.Member | None,
-        notify: str | None,
     ):
         if not target and isinstance(interaction.user, discord.Member):
             target = interaction.user
         if target and interaction.guild_id:
-            todo = make_todo(
-                contents,
-                interaction.user.name,
-                interaction.user.id,
+            todo = Todo(
                 target.name,
-                target.id,
-                interaction.guild_id,
+                interaction.user.name,
+                contents,
             )
         if not todo:
             await interaction.response.send_message(f"Failed to make Todo", silent=True)
-        todos = get_todos()
-        todos["incomplete"].append(todo)
-        save_todos(todos)
+        add_todo(todo)
         await interaction.response.send_message(
-            f"Todo for **{todo['target']}**: {todo['contents']}",
+            f"Todo for **{todo.Target}**: {todo.Content}",
             silent=True,
         )
 
-    @commands.command(name="gettodo")
-    async def get_todo(self, ctx: commands.Context):
-        todos = get_todos()
-        string = "You have the following incomplete todos\n"
-        index = 0
-        for todo in todos["incomplete"]:
-            if todo["target"] != str(ctx.message.author):
-                continue
-            string += f"{index} Submitted by **{todo["sender"]}**: " + todo["contents"] + "\n"
-            index += 1
-        string.strip()
-        if index == 0:
-            string = "You have no remaining todos to complete!"
-        await ctx.send(string)
-
-    @commands.command(name="fintodo")
-    async def finish_todo(self, ctx: commands.Context, *args):
-        todos = get_todos()
-        my_todos = [t for t in todos["incomplete"] if t["target"] == str(ctx.message.author)]
-
-        for arg in args:
-            if arg.isdigit() and int(arg) < len(my_todos):
-                tod = my_todos.pop(int(arg))
-                todos["incomplete"].remove(tod)
-                todos["complete"].append(tod)
-        save_todos(todos)
-        await ctx.send(f"Marked **{tod['contents']}** As Finished")
-
-    async def todo_autocomplete(self, intr: discord.Interaction, current: str) -> List[ac.Choice[str]]:
-        todos = get_todos()["incomplete"]
-        todos = list(filter(lambda x: x["target"] == intr.user.name, todos))
+    async def m_todo_autocomplete(self, intr: discord.Interaction, current: str) -> List[ac.Choice[str]]:
+        todos = get_todos(target=intr.user.name, state=TodoStateEnum.IN_COMPLETE)
         return [
-            ac.Choice(name=todo["contents"], value=todo["uuid"])
+            ac.Choice(name=todo.Content[:100], value=todo.Uuid)
             for todo in todos
-            if current.lower() in todo["contents"].lower()
+            if current.lower() in todo.Content.lower()
         ]
 
     @ac.command(name="fintodo", description="Mark Todo as Finished")
-    @ac.describe(todo_mark="The Todo of yours to mark as finished")
-    @ac.autocomplete(todo_mark=todo_autocomplete)
-    async def fin_todo(self, intr: discord.Interaction, todo_mark: str):
-        respond = intr.response.send_message
-        todos = get_todos()
-        tod = get_todo(todo_mark)
-        if not tod:
-            await respond("Failed to find Todo")
-            return
-        todos["incomplete"].remove(tod)
-        todos["complete"].append(tod)
-        save_todos(todos)
-        await respond(f"Marked **{tod['contents']}** As Finished")
-
-    # Get Todos
-    @ac.command(name="gettodos", description="Get all todos associated with given user")
-    @ac.describe(user="User to reveal todos of", state="Which category should the todos be in")
+    @ac.describe(todo_mark="The Todo of yours to mark as finished", mark_as="Mark as succes or failure")
+    @ac.autocomplete(todo_mark=m_todo_autocomplete)
     @ac.choices(
-        state=[
-            ac.Choice(name="InComplete", value="incomplete"),
-            ac.Choice(name="All", value="all"),
-            ac.Choice(name="Completed", value="complete"),
+        mark_as=[
+            ac.Choice(name="InProgress", value=TodoStateEnum.IN_PROGRESS.value),
+            ac.Choice(name="Succes", value=TodoStateEnum.SUCCES.value),
+            ac.Choice(name="Failed", value=TodoStateEnum.FAILED.value),
+            ac.Choice(name="InComplete", value=TodoStateEnum.IN_PROGRESS.value),
         ]
     )
-    async def get_todos(
+    async def m_fin_todo(self, intr: discord.Interaction, todo_mark: str, mark_as: ac.Choice[str] | None):
+        respond = intr.response.send_message
+        todo = get_todo(todo_mark)
+        if not todo:
+            await respond("Failed to find Todo", ephemeral=True)
+            return
+        todo.State = TodoStateEnum(mark_as) if mark_as else TodoStateEnum.SUCCES
+        save_modded_todo(todo)
+        await respond(f"Marked **{todo.Content}** As **{todo.State.value}**")
+
+    @ac.command(name="gettodos", description="Get all todos associated with given user")
+    @ac.describe(
+        user="User to reveal todos of, FishIn is everyone",
+        state="Which category should the todos be in, Leave empty for all",
+    )
+    @ac.choices(
+        state=[
+            ac.Choice(name="InProgress", value=TodoStateEnum.IN_PROGRESS.value),
+            ac.Choice(name="InComplete", value=TodoStateEnum.IN_PROGRESS.value),
+            ac.Choice(name="Succes", value=TodoStateEnum.SUCCES.value),
+            ac.Choice(name="Failed", value=TodoStateEnum.FAILED.value),
+        ]
+    )
+    async def m_get_todos(
         self,
         interaction: discord.Interaction,
         user: discord.Member,
-        state: ac.Choice[str],
+        state: ac.Choice[str] | None,
     ):
-        todos = get_todos()
+        e_state = TodoStateEnum(state.value) if state else None
         if user.name == "FishIn":
-            string = f"The group has the following todos\n"
+            string = f"The group has the following todos:\n"
+            todos = get_todos(state=e_state)
         else:
             string = f"User: **{user.name}** has the following todos:\n"
+            todos = get_todos(target=user.name, state=e_state)
 
-        in_todos = todos[state.value] if state.value != "all" else todos["complete"] + todos["incomplete"]
-        for todo in filter(lambda d: user.name in (d["target"], "FishIn"), in_todos):
+        for todo in todos:
             if user.name == "FishIn":
-                string += f"Submitted by **{todo['sender']}**, intended for **{todo['target']}**: {todo['contents']}\n"
+                string += f"Sent by **{todo.Sender}**, targeted for **{todo.Target}**, Cur State **{todo.State}**:  {todo.Content}\n"
             else:
-                string += f"Submitted by **{todo["sender"]}**: {todo["contents"]}\n"
+                string += f"Sent by **{todo.Sender}**, Cur State **{todo.State}**:  {todo.Content}\n"
+
+        if len(todos) == 0:
+            if user.name == "FishIn":
+                string = "The group has finished all todos!\nNow make some new and bet back to work you slackers"
+            else:
+                string = "You have nothing to do\nGet serious and do some work you coward"
         string.strip()
         await interaction.response.send_message(string, silent=True)
 

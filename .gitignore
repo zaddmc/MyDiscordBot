@@ -7,3 +7,5 @@ songs/*
 
 varstore/*.txt
 !varstore/.gitkeep
+
+main.db
