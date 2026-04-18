@@ -54,7 +54,9 @@ class Todo:
 
 
 def get_todos(
-    target: Optional[str] = None, sender: Optional[str] = None, state: Optional[TodoStateEnum] = None
+    target: Optional[str] = None,
+    sender: Optional[str] = None,
+    state: Optional[TodoStateEnum | list[TodoStateEnum]] = None,
 ) -> list[Todo]:
     query = "SELECT * FROM todo"
     conditions = []
@@ -66,10 +68,17 @@ def get_todos(
         conditions.append("sender = :sender")
         params["sender"] = sender
     if state:
-        conditions.append("state = :state")
-        params["state"] = state.value
+        states = state if isinstance(state, list) else [state]
+        state_keys = []
+        for i, s in enumerate(states):
+            key = f"state{i}"
+            state_keys.append(f":{key}")
+            params[key] = s.value
+
+        conditions.append(f"state IN ({', '.join(state_keys)})")
     if conditions:
         query += " WHERE " + " AND ".join(conditions)
+
     res = cur.execute(query, params)
     return [Todo(*row) for row in res.fetchall()]
 
