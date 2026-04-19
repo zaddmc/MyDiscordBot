@@ -12,14 +12,14 @@ if not con:
     cur = con.cursor()
     try:
         if "todo" not in cur.execute("SELECT name FROM sqlite_master").fetchone():
-            cur.execute("CREATE TABLE todo(target, sender, content, state, uuid)")
+            raise Exception("I am too lazy, table will be created")
     except Exception as e:
         lg.error(f"Failed to instantiate table: {e}")
-        cur.execute("CREATE TABLE todo(target, sender, content, state, uuid)")
+        cur.execute("CREATE TABLE todo(target, sender, content, priority, state, uuid)")
 
 
 class TodoStateEnum(Enum):
-    IN_COMPLETE = "InComplete"
+    NOT_BEGUN = "NotBegun"
     IN_PROGRESS = "InProgress"
     FAILED = "Failed"
     SUCCES = "Succes"
@@ -31,36 +31,40 @@ class Todo:
         target: str,
         sender: str,
         content: str,
-        state: TodoStateEnum | str = TodoStateEnum.IN_COMPLETE,
-        l_uuid: str | None = None,
+        priority: int = 0,
+        state: TodoStateEnum | str = TodoStateEnum.NOT_BEGUN,
+        l_uuid: Optional[str] = None,
     ):
         self.Target = target
         self.Sender = sender
         self.Content = content
+        self.Priority = priority
         self.State = state if isinstance(state, TodoStateEnum) else TodoStateEnum(state)
         self.Uuid = l_uuid if l_uuid else str(uuid.uuid4())
 
-    def to_sql(self) -> dict[str, str]:
+    def to_sql(self) -> dict[str, str | int]:
         return {
             "target": self.Target,
             "sender": self.Sender,
             "content": self.Content,
+            "priority": self.Priority,
             "state": self.State.value,
             "uuid": self.Uuid,
         }
 
     def __str__(self) -> str:
-        return f"<Todo: {self.Target=}, {self.Sender=}, {self.Content=}, {self.State=}, {self.Uuid=}>"
+        return f"<Todo: {self.Target=}, {self.Sender=}, {self.Content=}, {self.Priority=}, {self.State=}, {self.Uuid=}>"
 
 
 def get_todos(
     target: Optional[str] = None,
     sender: Optional[str] = None,
     state: Optional[TodoStateEnum | list[TodoStateEnum]] = None,
+    min_priority: Optional[int] = None,
 ) -> list[Todo]:
     query = "SELECT * FROM todo"
     conditions = []
-    params = {}
+    params: dict[str, str | int] = {}
     if target:
         conditions.append("target = :target")
         params["target"] = target
@@ -74,8 +78,10 @@ def get_todos(
             key = f"state{i}"
             state_keys.append(f":{key}")
             params[key] = s.value
-
         conditions.append(f"state IN ({', '.join(state_keys)})")
+    if min_priority:
+        conditions.append("priority >= :priority")
+        params["priority"] = min_priority
     if conditions:
         query += " WHERE " + " AND ".join(conditions)
 
@@ -89,22 +95,8 @@ def get_todo(l_uuid: str) -> Optional[Todo]:
 
 
 def add_todo(todo: Todo):
-    cur.execute("INSERT INTO todo VALUES(:target, :sender, :content, :state, :uuid)", todo.to_sql())
+    cur.execute("INSERT INTO todo VALUES(:target, :sender, :content, :priority, :state, :uuid)", todo.to_sql())
 
 
 def save_modded_todo(todo: Todo):
-    cur.execute("UPDATE todo SET content=:content, state=:state WHERE uuid=:uuid", todo.to_sql())
-
-
-if __name__ == "__main__":
-    todoes = Todo("aw", "me", "Testing")
-    print(todoes)
-    add_todo(todoes)
-    print("Getting it back", get_todo(todoes.Uuid))
-    todoes.Content = "New testing"
-    todoes.State = TodoStateEnum.FAILED
-    save_modded_todo(todoes)
-    print("Getting cahges back", get_todo(todoes.Uuid))
-    print()
-    for tod in get_todos(state=TodoStateEnum.IN_COMPLETE):
-        print(tod)
+    cur.execute("UPDATE todo SET content=:content, priority=:priority, state=:state WHERE uuid=:uuid", todo.to_sql())
