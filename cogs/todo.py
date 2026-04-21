@@ -181,7 +181,8 @@ class TodoHandler(commands.Cog):
             return
         todo.Target = "FishIn"
         save_modded_todo(todo)
-        await intr.response.send_message("Todo has been freed, and is available to take", silent=True)
+        todo_cont = " **Truncated**" if "\n" in todo.Content else ""
+        await intr.response.send_message(f"Todo has been freed, and is available to take\n{todo_cont}", silent=True)
 
 
 from utils import get_guilds
