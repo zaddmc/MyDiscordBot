@@ -52,6 +52,9 @@ class Todo:
             "uuid": self.Uuid,
         }
 
+    def __repr__(self) -> str:
+        return str(self)
+
     def __str__(self) -> str:
         return f"<Todo: {self.Target=}, {self.Sender=}, {self.Content=}, {self.Priority=}, {self.State=}, {self.Uuid=}>"
 
@@ -99,4 +102,7 @@ def add_todo(todo: Todo):
 
 
 def save_modded_todo(todo: Todo):
-    cur.execute("UPDATE todo SET content=:content, priority=:priority, state=:state WHERE uuid=:uuid", todo.to_sql())
+    cur.execute(
+        "UPDATE todo SET target=:target, content=:content, priority=:priority, state=:state WHERE uuid=:uuid",
+        todo.to_sql(),
+    )
