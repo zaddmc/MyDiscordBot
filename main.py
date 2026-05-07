@@ -79,9 +79,13 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
     if isinstance(channel, discord.TextChannel):
         message = await channel.fetch_message(payload.message_id)
 
+    for reaction in message.reactions:
+        if reaction.emoji == "🔒" and "zaddmc" in [usr.name async for usr in reaction.users()]:
+            return
+
     cha = bot.get_channel(1425561165802770492)  # Server Usage - bot logs
     if isinstance(cha, discord.TextChannel):
-        await cha.send(content=f"This has been deleted by {message.author}:\n" + message.content)
+        await cha.send(content=f"This has been deleted by **{payload.member}**:\n" + message.content)
 
     await message.delete()
 

@@ -37,9 +37,7 @@ def __get_user(message: discord.Message) -> discord.Member:
     return message.guild.get_member_named(usr)
 
 
-async def add_to_varstore(
-    message: discord.Message, usr: discord.User, msg: str, list_type: VSE
-):
+async def add_to_varstore(message: discord.Message, usr: discord.User, msg: str, list_type: VSE):
     exchanges = get_varstore(list_type)
     new_msg = " ".join(msg)
     exchanges[str(usr)] = new_msg
@@ -47,9 +45,7 @@ async def add_to_varstore(
     await message.channel.send(f"User: {str(usr)} will now be bullied with: {new_msg}")
 
 
-async def remove_from_varstore(
-    message: discord.Message, usr: discord.User, varstores: list[str] | None = None
-):
+async def remove_from_varstore(message: discord.Message, usr: discord.User, varstores: list[str] | None = None):
     if varstores == None:
         varstores = VSE
 
@@ -87,9 +83,7 @@ async def leaky(bot, message: discord.Message):
     msg = message.content.split()
     match msg[2]:
         case "servers":
-            string = "Connected Servers are\n" + "\n".join(
-                map(lambda g: f"{g}: {g.id}", bot.guilds)
-            )
+            string = "Connected Servers are\n" + "\n".join(map(lambda g: f"{g}: {g.id}", bot.guilds))
             await message.channel.send(string)
 
         case "channels":
@@ -103,8 +97,7 @@ async def leaky(bot, message: discord.Message):
             guild = await bot.fetch_guild(int(msg[3]))
             channels = await guild.fetch_channels()
             await message.channel.send(
-                "Available channels are:\n"
-                + "\n".join(map(lambda s: f"{s.name}: {s.id}", channels))
+                "Available channels are:\n" + "\n".join(map(lambda s: f"{s.name}: {s.id}", channels))
             )
 
         case "send":
@@ -134,9 +127,7 @@ async def microslop(bot, message: discord.Message):
 
 async def nogipity(bot, message: discord.Message):
     if "?utm_source=chatgpt.com" in message.content:
-        await message.reply(
-            "broo, don't include chat gipity as a source\nsanitize your sources"
-        )
+        await message.reply("broo, don't include chat gipity as a source\nsanitize your sources")
 
 
 async def delete(bot, message: discord.Message):
@@ -159,6 +150,6 @@ async def delete(bot, message: discord.Message):
 
     await other_message.delete()
 
-    if not message.author.guild_permissions.manage_messages:
+    if not isinstance(message.author, discord.User) and not message.author.guild_permissions.manage_messages:
         return
     await message.delete()
