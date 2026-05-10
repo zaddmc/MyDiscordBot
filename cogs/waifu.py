@@ -8,117 +8,51 @@ from discord.ext import commands
 
 import utils
 
-W2_SFW_TAGS = "waifu neko shinobu megumin cuddle cry hug awoo kiss lick pat smug bonk yeet blush smile wave highfive handhold nom bite happy wink poke dance".split()
-W2_OTHER = "bully glomp slap kill kick".split()
-W2_NSFW_TAGS = "waifu neko trap blowjob".split()
+URL_BASE = "https://api.waifu.im/"
+
+
+def get_tags() -> dict[str, str]:
+    # This will only get 30 tags, but that is fine as the bot can only show 30 or 25. As of current it only has 19
+    resp = requests.get(URL_BASE + "tags")
+    if resp.status_code != 200:
+        return {"no-tags": "Sorry, failed to fetch tags"}
+    tags = {}
+    for item in resp.json()["items"]:
+        desc = item["name"] + " - " + item["description"]
+        if len(desc) > 100:
+            desc = desc[:96] + "..."
+        tags[item["slug"]] = desc
+    return tags
 
 
 class WaifuHandler(commands.Cog):
     def __init__(self, bot):
-        self.bot: discord.Bot = bot
+        self.bot: commands.Bot = bot
 
-    @commands.command(name="waifu")
-    async def get_waifu(self, ctx: commands.Context, *args):
-        """I am not proud of this function, it was commissioned by William Bjerglund"""
-
-        versatile_tag = [
-            "maid",
-            "waifu",
-            "marin-kitagawa",
-            "mori-calliope",
-            "raiden-shogun",
-            "oppai",
-            "selfies",
-            "uniform",
-            "kamisato-ayaka",
-        ]
-        nsfw_tag = ["ass", "hentai", "milf", "oral", "paizuri", "ecchi", "ero"]
-
-        url = "https://api.waifu.im/search"
+    @ac.command(name="waifu", description="Get a waifu")
+    @ac.describe(tag="The desired tag", is_nsfw="Do you want Not Safe For Work Content? Any value is fine")
+    @ac.choices(tag=[ac.Choice(name=v, value=k) for k, v in get_tags().items()])
+    async def get_waifu_v3(self, intr: discord.Interaction, tag: ac.Choice[str] | None, is_nsfw: str | None = None):
         params = {}
 
-        if len(args) == 0:
-            params["included_tags"] = random.choice(versatile_tag)
+        is_cha_nsfw = getattr(intr.channel, "is_nsfw", lambda: False)()
+        if is_cha_nsfw and is_nsfw:
+            params["IsNsfw"] = "True"
 
+        if tag:
+            params["IncludedTags"] = tag.value
+
+        resp = requests.get(URL_BASE + "images", params)
+        if resp.status_code != 200 or len(resp.json()["items"]) == 0:
+            await intr.response.send_message("Failed to find an image matching your request", ephemeral=True)
         else:
-            is_channel_nsfw = getattr(ctx.channel, "is_nsfw", lambda: False)()
+            await intr.response.send_message(resp.json()["items"][0]["url"])
 
-            all_tags = versatile_tag.copy()
-            if is_channel_nsfw:
-                all_tags.extend(nsfw_tag.copy())
-
-            valid_tags = [b for b in map(lambda a: a.lower(), args) if b in all_tags]
-
-            params["included_tags"] = ",".join(valid_tags)
-            params["nsfw"] = "true" if is_channel_nsfw else "false"
-
-        response = requests.get(url, params=params)
-
-        if response.status_code == 200:
-            data = response.json()
-            await ctx.send(data["images"][0]["url"])
-        else:
-            await ctx.send("Failed to get image")
-
-    @ac.command(
-        name="summonwilliam", description="Gurateed to summon william within 2 min"
-    )
+    @ac.command(name="summonwilliam", description="Gurateed to summon william within 2 min")
     async def william101(self, intr: discord.Interaction):
-        url = "https://api.waifu.pics/nsfw/trap"
-        response = requests.get(url)
-
-        await utils.william.send(f"You have been summoned in {intr.channel.name}")
-
-        if response.status_code == 200:
-            data = response.json()
-            await intr.response.send_message(data["url"])
-        else:
-            await intr.response.send_message("Failed to get image")
-
-    @ac.command(name="waifu2", description="Only choose one tag")
-    @ac.describe(sfw_tag="This is sfw", nsfw_tag="This is not sfw")
-    @ac.choices(
-        sfw_tag=[ac.Choice(name=t, value=t) for t in W2_SFW_TAGS],
-        nsfw_tag=[ac.Choice(name=t, value=t) for t in W2_NSFW_TAGS + W2_OTHER],
-    )
-    async def get_waifu2(
-        self,
-        interaction: discord.Interaction,
-        sfw_tag: ac.Choice[str] | None,
-        nsfw_tag: ac.Choice[str] | None,
-    ):
-        """I am not proud of this function, it was commissioned by William Bjerglund"""
-
-        is_channel_nsfw = getattr(interaction.channel, "is_nsfw", lambda: False)()
-
-        all_tags = W2_SFW_TAGS.copy()
-        all_tags.extend(W2_OTHER.copy())
-        if is_channel_nsfw:
-            all_tags.extend(W2_NSFW_TAGS.copy())
-
-        is_tag_nsfw = False
-        tag = None
-        if sfw_tag:
-            tag = sfw_tag.value
-        elif nsfw_tag and is_channel_nsfw:
-            tag = nsfw_tag.value
-            if tag in W2_NSFW_TAGS:
-                is_tag_nsfw = True
-        else:
-            print("Unforseen tag")
-            tag = "waifu"
-
-        url = f"https://api.waifu.pics/{"nsfw" if is_tag_nsfw else "sfw"}/{tag}"
-
-        response = requests.get(url)
-        cha = self.bot.get_channel(1425561165802770492)  # Server Usage - bot logs
-
-        if response.status_code == 200:
-            data = response.json()
-            await cha.send(f"{interaction.user.name} {url} <{data['url']}>")
-            await interaction.response.send_message(data["url"])
-        else:
-            await interaction.response.send_message("Failed to get image")
+        await intr.response.send_message(
+            "Sadly the new api does not have the Trap tag, thereby rendering this command useless"
+        )
 
     @commands.command(name="joke")
     async def get_joke(self, ctx: commands.Context):
