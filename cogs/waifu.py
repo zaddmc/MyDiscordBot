@@ -18,7 +18,7 @@ def get_tags() -> dict[str, str]:
         return {"no-tags": "Sorry, failed to fetch tags"}
     tags = {}
     for item in resp.json()["items"]:
-        if item["totalCount"] == 0:
+        if item["imageCount"] == 0:
             continue
         desc = item["name"] + " - " + item["description"]
         if len(desc) > 100:
