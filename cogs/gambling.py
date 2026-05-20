@@ -16,16 +16,16 @@ class GameState:
     def __init__(self, cha_id: int):
         self.cha_id: int = cha_id
         # Players with their id and points
-        self.players: dict[int, int] = {}
+        self.players: dict[str, int] = {}
         self.pool: int = 0
 
-    def place_bet(self, player_id: int, amount: int):
-        if player_id not in self.players.keys():
-            self.players[player_id] = START_POINTS
+    def place_bet(self, player: str, amount: int):
+        if player not in self.players.keys():
+            self.players[player] = START_POINTS
 
-        if self.players[player_id] >= amount:
+        if self.players[player] >= amount:
             self.pool += amount
-            self.players[player_id] -= amount
+            self.players[player] -= amount
             return True
         return False
 
@@ -41,16 +41,18 @@ class Gambling(commands.Cog):
     @ac.describe(amount="The amount to gamble, leave empty for call")
     async def place_bet(self, intr: discord.Interaction, amount: int | None):
         respond = intr.response.send_message
-        cha_id: int = intr.channel_id
-        if not amount:
-            amount = 10
+        cha_id: int | None = intr.channel_id
+        if not cha_id:
+            await respond("Failed to get channel", ephemeral=True)
+            return
+
+        amount = amount if amount else 10
 
         if intr.channel_id not in self.boards.keys():
             self.boards[cha_id] = GameState(cha_id)
-
         board: GameState = self.boards[cha_id]
 
-        if board.place_bet(intr.user.id, amount):
+        if board.place_bet(intr.user.name, amount):
             await respond("Your bet has been placed")
         else:
             await respond("Failed to place your bet", ephemeral=True)
