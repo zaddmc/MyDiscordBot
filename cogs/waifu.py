@@ -1,4 +1,5 @@
 import json
+import os
 import random
 
 import discord
@@ -37,8 +38,7 @@ class WaifuHandler(commands.Cog):
     async def get_waifu_v3(self, intr: discord.Interaction, tag: ac.Choice[str] | None, is_nsfw: str | None = None):
         params = {}
 
-        is_cha_nsfw = getattr(intr.channel, "is_nsfw", lambda: False)()
-        if is_cha_nsfw and is_nsfw:
+        if is_nsfw:
             params["IsNsfw"] = "True"
 
         if tag:
@@ -85,6 +85,28 @@ class WaifuHandler(commands.Cog):
             await respond(string)
         else:
             await respond("rimuru is best GIRL")
+
+    @ac.command(name="waifu_spicy", description="Get the most spicy Waifu. Warning: only NSFW")
+    async def get_spicy_waifu(self, intr: discord.Interaction):
+        respond = intr.response.send_message
+        url = "https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=1&json=1"
+        api_key = os.getenv("R34_API_KEY")
+        user_id = os.getenv("R34_USER_ID")
+
+        if not (api_key and user_id):
+            await respond("Failed to load API key", ephemeral=True)
+            return
+
+        url += "&api_key=" + api_key
+        url += "&user_id=" + user_id
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()[0]
+            img = data["file_url"]
+            await respond(img)
+        else:
+            await respond("Failed to get image", ephemeral=True)
 
 
 from utils import get_guilds
