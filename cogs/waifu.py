@@ -39,7 +39,7 @@ class WaifuHandler(commands.Cog):
     async def m_tag_autocomplete(self, intr: discord.Interaction, current: str) -> list[ac.Choice[str]]:
         return [ac.Choice(name=name, value=id) for id, name in get_tags().items() if current.lower() in name.lower()]
 
-    @ac.command(name="nnwaifu", description="Get a waifu")
+    @ac.command(name="waifu", description="Get a waifu")
     @ac.describe(tag="The desired tag", rating="The rating of the content")
     @ac.choices(
         rating=[
