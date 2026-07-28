@@ -1,6 +1,7 @@
 import json
 import os
 import random
+from typing import Optional
 
 import discord
 import requests
@@ -9,22 +10,25 @@ from discord.ext import commands
 
 import utils
 
-URL_BASE = "https://api.waifu.im/"
+URL_BASE = "https://api.nekosapi.com/v5"
+TAG_CACHE: Optional[dict] = None
 
 
 def get_tags() -> dict[str, str]:
-    # This will only get 30 tags, but that is fine as the bot can only show 30 or 25. As of current it only has 19
-    resp = requests.get(URL_BASE + "tags")
+    global TAG_CACHE
+    if TAG_CACHE:
+        return TAG_CACHE
+
+    resp = requests.get(URL_BASE + "/tags")
     if resp.status_code != 200:
         return {"no-tags": "Sorry, failed to fetch tags"}
     tags = {}
     for item in resp.json()["items"]:
-        if item["imageCount"] == 0:
-            continue
-        desc = item["name"] + " - " + item["description"]
+        desc = item["name"] + " - " + ("SFW" if item["is_nsfw"] else "NSFW")
         if len(desc) > 100:
             desc = desc[:96] + "..."
-        tags[item["slug"]] = desc
+        tags[item["id"]] = desc
+    TAG_CACHE = tags
     return tags
 
 
@@ -32,29 +36,29 @@ class WaifuHandler(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
 
-    @ac.command(name="waifu", description="Get a waifu")
-    @ac.describe(tag="The desired tag", is_nsfw="Do you want Not Safe For Work Content? Any value is fine")
-    @ac.choices(tag=[ac.Choice(name=v, value=k) for k, v in get_tags().items()])
-    async def get_waifu_v3(self, intr: discord.Interaction, tag: ac.Choice[str] | None, is_nsfw: str | None = None):
-        params = {}
+    async def m_tag_autocomplete(self, intr: discord.Interaction, current: str) -> list[ac.Choice[str]]:
+        return [ac.Choice(name=name, value=id) for id, name in get_tags().items() if current.lower() in name.lower()]
 
-        if is_nsfw:
-            params["IsNsfw"] = "True"
+    @ac.command(name="nnwaifu", description="Get a waifu")
+    @ac.describe(tag="The desired tag", rating="The rating of the content")
+    @ac.choices(
+        rating=[
+            ac.Choice(name="Safe", value="safe"),
+            ac.Choice(name="Suggestive", value="suggestive"),
+            ac.Choice(name="Borderline", value="borderline"),
+            ac.Choice(name="Explicit", value="explicit"),
+        ]
+    )
+    @ac.autocomplete(tag=m_tag_autocomplete)
+    async def get_waifu_v4(self, intr: discord.Interaction, tag: Optional[str], rating: ac.Choice[str] | None):
+        params = "&".join((f"tag={tag}" if tag else "", f"rating={rating.value}" if rating else ""))
+        query = URL_BASE + "/images/random" + ("?" + params if len(params) else "")
 
-        if tag:
-            params["IncludedTags"] = tag.value
-
-        resp = requests.get(URL_BASE + "images", params)
-        if resp.status_code != 200 or len(resp.json()["items"]) == 0:
+        resp = requests.get(query)
+        if resp.status_code != 200:
             await intr.response.send_message("Failed to find an image matching your request", ephemeral=True)
         else:
-            await intr.response.send_message(resp.json()["items"][0]["url"])
-
-    @ac.command(name="summonwilliam", description="Gurateed to summon william within 2 min")
-    async def william101(self, intr: discord.Interaction):
-        await intr.response.send_message(
-            "Sadly the new api does not have the Trap tag, thereby rendering this command useless"
-        )
+            await intr.response.send_message(resp.json()["url"])
 
     @commands.command(name="joke")
     async def get_joke(self, ctx: commands.Context):
