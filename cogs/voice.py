@@ -3,6 +3,7 @@ import random
 from time import sleep
 
 import discord
+from discord import Member, VoiceChannel, VoiceState
 from discord import app_commands as ac
 from discord.ext import commands
 
@@ -16,26 +17,24 @@ class Voice(commands.Cog):
 
     def play_martin_song(self, voice_client: discord.VoiceClient):
         # Play Martin er en uran hjort
-        voice_client.play(
-            discord.FFmpegPCMAudio(
-                executable="ffmpeg", source="songs/intro_song_martin.mp3"
-            )
-        )
+        voice_client.play(discord.FFmpegPCMAudio(executable="ffmpeg", source="songs/intro_song_martin.mp3"))
 
     @ac.command(name="join", description="Tells the bot to join your vc")
     async def join(self, intr: discord.Interaction):
         respond = intr.response.send_message  # Just an alias
-        if not intr.user.voice:
-            await respond(
-                f"{intr.user.name} is not connected to a voice channel",
-                ephemeral=True,
-            )
-        else:
-            await intr.user.voice.channel.connect()
-            await respond("Connected to Voice channel", ephemeral=True)
+        if (
+            not isinstance(intr.user, Member)
+            or not isinstance(intr.user.voice, VoiceState)
+            or not isinstance(intr.user.voice.channel, VoiceChannel)
+        ):
+            await respond("Failed to join Voice Channel", ephemeral=True)
+            return
 
-            # Play Martin er en uran hjort
-            self.play_martin_song(intr.guild.voice_client)
+        await intr.user.voice.channel.connect()
+        await respond("Connected to Voice channel", ephemeral=True)
+
+        # Play Martin er en uran hjort
+        # self.play_martin_song(intr.guild.voice_client)
 
     @ac.command(name="leave", description="Make the bot leave")
     async def leave(self, intr: discord.Interaction):
@@ -84,9 +83,7 @@ class Voice(commands.Cog):
         if voice_client.is_paused():
             await voice_client.resume()
         else:
-            await ctx.send(
-                "The bot was not playing anything before this. Use play_song command"
-            )
+            await ctx.send("The bot was not playing anything before this. Use play_song command")
 
     @ac.command(name="stop", description="Stops playing")
     async def stop(self, intr: discord.Interaction):
