@@ -1,4 +1,6 @@
 import logging
+import re
+import subprocess
 
 import a2s
 import discord
@@ -10,6 +12,18 @@ import utils
 from utils import get_guilds
 
 lg = logging.getLogger(__name__)
+
+
+def valheim_join_code():
+    cmd = "docker logs --tail 500 valheim"
+    rune = r"join code (\d+)"
+    res = subprocess.check_output(cmd.split()).decode("utf-8").strip().splitlines()
+
+    for line in res[::-1]:
+        code = re.findall(rune, line)
+        if code:
+            return code[0]
+    return "No Code"
 
 
 class Minecraft(commands.Cog):
@@ -27,25 +41,22 @@ class Minecraft(commands.Cog):
         try:
             mc_players = self.mc_server.status().players.online
         except:
-            mc_players = 0
+            mc_players = None
 
         try:
             se_players = a2s.info(self.se_addr, timeout=3).player_count
         except:
-            se_players = 0
+            se_players = None
 
-        lg.info(f"Updating status cur {mc_players} in minecraft and {se_players} in space")
+        try:
+            val_code = valheim_join_code()
+        except:
+            val_code = None
 
-        players = sum([mc_players, se_players])
-        if mc_players != 0 and se_players != 0:
-            game = "MC+SE"
-        elif mc_players != 0:
-            game = "MC"
-        elif se_players != 0:
-            game = "SE"
+        lg.info(f"Updating status")
 
-        if players:
-            activity = discord.Game(name=f"{players} Playing {game}")
+        if val_code:
+            activity = discord.Game(name=f"Valheim: {val_code}")
             await self.bot.change_presence(activity=activity)
         else:
             await self.bot.change_presence(activity=None)
