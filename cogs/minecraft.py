@@ -1,6 +1,7 @@
 import logging
 import re
 import subprocess
+from typing import Optional
 
 import a2s
 import discord
@@ -23,7 +24,7 @@ def valheim_join_code():
         code = re.findall(rune, line)
         if code:
             return code[0]
-    return "No Code"
+    return None
 
 
 class Minecraft(commands.Cog):
@@ -32,31 +33,34 @@ class Minecraft(commands.Cog):
         self.mc_server: JavaServer = JavaServer.lookup(utils.get_server_ip())
         self.se_addr: tuple[str, int] = ("127.0.0.1", 27912)
         self.task_update_status.start()
+        self.valheim_code: Optional[str]
 
     def cog_unload(self):
         lg.info("Stopping cog Minecraft")
         self.task_update_status.cancel()
 
     async def update_status(self):
-        try:
-            mc_players = self.mc_server.status().players.online
-        except:
-            mc_players = None
-
-        try:
-            se_players = a2s.info(self.se_addr, timeout=3).player_count
-        except:
-            se_players = None
+        # try:
+        #     mc_players = self.mc_server.status().players.online
+        # except:
+        #     mc_players = None
+        #
+        # try:
+        #     se_players = a2s.info(self.se_addr, timeout=3).player_count
+        # except:
+        #     se_players = None
 
         try:
             val_code = valheim_join_code()
         except:
             val_code = None
 
+        self.valheim_code = self.valheim_code if val_code == None else val_code
+
         lg.info(f"Updating status")
 
-        if val_code:
-            activity = discord.Game(name=f"Valheim: {val_code}")
+        if self.valheim_code:
+            activity = discord.Game(name=f"Valheim: {self.valheim_code}")
             await self.bot.change_presence(activity=activity)
         else:
             await self.bot.change_presence(activity=None)
@@ -70,26 +74,26 @@ class Minecraft(commands.Cog):
         await self.bot.wait_until_ready()
         lg.info("Starting auto status updater")
 
-    @ac.command(name="update_status", description="manually start updating status")
-    async def manual_update_status(self, intr: discord.Interaction):
-        respond = intr.response.send_message
-        await self.update_status()
-        await respond("Updated the status", ephemeral=True)
-
-    @ac.command(name="get_players", description="Get current players in Minecraft Server")
-    async def get_players(self, intr: discord.Interaction):
-        respond = intr.response.send_message
-
-        try:
-            status = self.mc_server.status().players
-            respone = f"There is currently {status.online} player in game"
-            if status.online:
-                for player in status.sample:
-                    respone += f"\n- {player.name}"
-
-            await respond(respone)
-        except:
-            await respond("Server is currently Down")
+    # @ac.command(name="update_status", description="manually start updating status")
+    # async def manual_update_status(self, intr: discord.Interaction):
+    #     respond = intr.response.send_message
+    #     await self.update_status()
+    #     await respond("Updated the status", ephemeral=True)
+    #
+    # @ac.command(name="get_players", description="Get current players in Minecraft Server")
+    # async def get_players(self, intr: discord.Interaction):
+    #     respond = intr.response.send_message
+    #
+    #     try:
+    #         status = self.mc_server.status().players
+    #         respone = f"There is currently {status.online} player in game"
+    #         if status.online:
+    #             for player in status.sample:
+    #                 respone += f"\n- {player.name}"
+    #
+    #         await respond(respone)
+    #     except:
+    #         await respond("Server is currently Down")
 
 
 async def setup(bot: commands.Bot):
