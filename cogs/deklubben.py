@@ -10,11 +10,13 @@ import logging
 import time
 import urllib
 from datetime import time as dt_time
-from typing import Any, Optional
+from typing import Any, Optional, TypedDict
 
 import discord
 from discord import app_commands as ac
 from discord.ext import commands, tasks
+
+import utils
 
 lg = logging.getLogger(__name__)
 
@@ -44,6 +46,26 @@ UNIT_LABELS = {
 }
 
 
+class CacheData(TypedDict):
+    golds: dict[str, list[str]]
+    leaderboards: list[Leaderboard]
+
+
+class Leaderboard(TypedDict):
+    title: str
+    period_code: str
+    period_name: str
+    unit: str
+    entries: list[Entries]
+
+
+class Entries(TypedDict):
+    name: str
+    pk: int
+    sum: int | str
+    index: int
+
+
 def _clean_text(val: Optional[str]) -> str:
     if not val:
         return ""
@@ -55,7 +77,7 @@ class DEKlubbenLeaderboard(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self._cached_data: Optional[dict[str, Any]] = None
+        self._cached_data: Optional[CacheData] = None
         self._cached_users: list[str] = []
         self._cached_categories: list[str] = []
         self._cache_timestamp: float = 0
@@ -114,12 +136,13 @@ class DEKlubbenLeaderboard(commands.Cog):
             return " 🥉 "
         return f"#{rank:02d}"
 
-    def _fetch_slideshow_data(self, force: bool = False) -> dict[str, Any]:
+    def _fetch_slideshow_data(self, force: bool = False) -> CacheData:
         """Fetch slides and parse highscores from deklubben.dk with in-memory caching."""
         now = time.time()
         if not force and self._cached_data and (now - self._cache_timestamp < self._cache_ttl_seconds):
             return self._cached_data
 
+        # TODO: Change this to make it not look at these
         req = urllib.request.Request(f"{FETCH_SLIDES_URL}?slideshow=1", headers={"User-Agent": "DiscordBot-Syntax/1.0"})
         with urllib.request.urlopen(req, timeout=10) as resp:
             slides_meta = json.loads(resp.read().decode("utf-8"))
@@ -146,49 +169,53 @@ class DEKlubbenLeaderboard(commands.Cog):
                 lg.warning(f"Failed to fetch slide pk {pk}: {e}")
                 continue
 
-            if slide_data.get("type") == 1:
-                # Column 1
-                h1 = slide_data.get("high_one")
-                p1 = str(slide_data.get("period_one", "0"))
-                ht1 = slide_data.get("highscore_type_one", 3)
-                if h1 and isinstance(h1, list):
-                    title1 = _clean_text(h1[0].get("title", "Ukendt"))
-                    leaderboards.append(
-                        {
-                            "title": title1,
-                            "period_code": p1,
-                            "period_name": PERIOD_NAMES.get(p1, f"Periode {p1}"),
-                            "unit": UNIT_LABELS.get(ht1, "stk"),
-                            "entries": h1[1:],
-                        }
-                    )
-                    for item in h1[1:]:
-                        n = _clean_text(item.get("name", ""))
-                        if n and n != "Ukendt":
-                            user_set.add(n)
+            if slide_data.get("type") != 1:
+                lg.warning(f"Slide {pk} did not respond with expected type")
+                continue
 
-                # Column 2
-                h2 = slide_data.get("high_two")
-                p2 = str(slide_data.get("period_two", "1"))
-                ht2 = slide_data.get("highscore_type_two", 3)
-                if h2 and isinstance(h2, list):
-                    title2 = _clean_text(h2[0].get("title", "Ukendt"))
-                    leaderboards.append(
-                        {
-                            "title": title2,
-                            "period_code": p2,
-                            "period_name": PERIOD_NAMES.get(p2, f"Periode {p2}"),
-                            "unit": UNIT_LABELS.get(ht2, "stk"),
-                            "entries": h2[1:],
-                        }
-                    )
-                    for item in h2[1:]:
-                        n = _clean_text(item.get("name", ""))
-                        if n and n != "Ukendt":
-                            user_set.add(n)
+            # Column 1
+            h1 = slide_data.get("high_one")
+            p1 = str(slide_data.get("period_one", "0"))
+            ht1 = slide_data.get("highscore_type_one", 3)
+            if h1 and isinstance(h1, list):
+                title1 = _clean_text(h1[0].get("title", "Ukendt"))
+                leadboard: Leaderboard = {
+                    "title": title1,
+                    "period_code": p1,
+                    "period_name": PERIOD_NAMES.get(p1, f"Periode {p1}"),
+                    "unit": UNIT_LABELS.get(ht1, "stk"),
+                    "entries": h1[1:],  # Skip the first elemet which is the title
+                }
+                leaderboards.append(leadboard)
+
+                for item in h1[1:]:
+                    n = _clean_text(item.get("name", ""))
+                    if n and n != "Ukendt":
+                        user_set.add(n)
+
+            # Column 2
+            h2 = slide_data.get("high_two")
+            p2 = str(slide_data.get("period_two", "1"))
+            ht2 = slide_data.get("highscore_type_two", 3)
+            if h2 and isinstance(h2, list):
+                title2 = _clean_text(h2[0].get("title", "Ukendt"))
+                leadboard: Leaderboard = {
+                    "title": title2,
+                    "period_code": p2,
+                    "period_name": PERIOD_NAMES.get(p2, f"Periode {p2}"),
+                    "unit": UNIT_LABELS.get(ht2, "stk"),
+                    "entries": h2[1:],  # Skip the first elemet which is the title
+                }
+                leaderboards.append(leadboard)
+
+                for item in h2[1:]:
+                    n = _clean_text(item.get("name", ""))
+                    if n and n != "Ukendt":
+                        user_set.add(n)
+
         # Precompute sorted autocomplete lists once during fetch
         self._cached_users = sorted(user_set, key=str.casefold)
-        self._cached_categories = sorted(list(set(b["title"] for b in leaderboards)))
+        self._cached_categories = sorted(set(b["title"] for b in leaderboards))
 
         self._cached_data = {
             "golds": golds,
@@ -237,7 +264,7 @@ class DEKlubbenLeaderboard(commands.Cog):
             )
             return
 
-        board = matches[0]
+        board: Leaderboard = matches[0]
         embed = discord.Embed(
             title=f"🏆 {board['title']} 🏆",
             description=f"**Periode:** {board['period_name']}",
@@ -252,8 +279,7 @@ class DEKlubbenLeaderboard(commands.Cog):
             badge = self._get_badge_string(name, data["golds"])
             rank_emoji = self._get_rank_emoji(rank)
 
-            score_str = f"{score:.2f}" if isinstance(score, float) and not score.is_integer() else f"{int(score)}"
-            rows.append(f"{rank_emoji} **{name}**{badge} — `{score_str} {board['unit']}`")
+            rows.append(f"{rank_emoji} **{name}**{badge} — `{score} {board['unit']}`")
 
         embed.add_field(name="Leaderboard", value="\n".join(rows) or "Ingen data", inline=False)
         await intr.followup.send(embed=embed)
@@ -292,11 +318,10 @@ class DEKlubbenLeaderboard(commands.Cog):
             await intr.followup.send(f"❌ Failed to find leaderboards with `{name}` in top 10.", ephemeral=True)
             return
 
-        matched_name = records[0]["name"]
-        badge = self._get_badge_string(matched_name, data["golds"])
+        badge = self._get_badge_string(name, data["golds"])
 
         embed = discord.Embed(
-            title=f"👤 User Profile: {matched_name}{badge}",
+            title=f"👤 User Profile: {name}{badge}",
             color=discord.Color.purple(),
         )
 
@@ -309,6 +334,29 @@ class DEKlubbenLeaderboard(commands.Cog):
 
         embed.add_field(name="Highscore Placements", value="\n".join(lines), inline=False)
         await intr.followup.send(embed=embed)
+
+    @ac.command(name="de_admin", description="Power to the discord admin to administrate this util")
+    @ac.describe(cmd="The action to take")
+    @ac.choices(cmd=[ac.Choice(name="Reload", value="reload")])
+    async def de_admin(self, intr: discord.Interaction, cmd: str):
+        await intr.response.defer()
+
+        if intr.user not in utils.authorized_users:
+            await utils.log_channel.send(f"User {intr.user.name} tried to use de_admin cmd='{cmd}'")
+            await intr.followup.send(f"You Do not have access to this function", ephemeral=True)
+            return
+
+        match cmd:
+            case "reload":
+                try:
+                    data = self._fetch_slideshow_data()
+                except Exception as e:
+                    lg.error(f"Error failed to fetch")
+                    await intr.followup.send(f"❌ Failed to fetch data", ephemeral=True)
+                else:
+                    await intr.followup.send(f"✅ Succesfully fetched new data", ephemeral=True)
+            case _:
+                await intr.followup.send(f"This is litterely impossible, Good on you", ephemeral=True)
 
 
 from utils import get_guilds
