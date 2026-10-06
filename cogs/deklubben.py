@@ -354,6 +354,7 @@ class DEKlubbenLeaderboard(commands.Cog):
                     lg.error(f"Error failed to fetch")
                     await intr.followup.send(f"❌ Failed to fetch data", ephemeral=True)
                 else:
+                    self._cached_data = data
                     await intr.followup.send(f"✅ Succesfully fetched new data", ephemeral=True)
             case _:
                 await intr.followup.send(f"This is litterely impossible, Good on you", ephemeral=True)
