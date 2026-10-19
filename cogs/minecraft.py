@@ -95,6 +95,27 @@ class Minecraft(commands.Cog):
     #     except:
     #         await respond("Server is currently Down")
 
+    @ac.command(name="update_valheim", description="Update the valheim server because it kinda dumb")
+    async def update_valheim(self, intr: discord.Interaction):
+        if intr.user.name not in ["zaddmc", "boltz333"]:
+            await utils.log_channel.send(f"User: **{intr.user.name}** Tried to execute a command")
+            await intr.response.send_message("You do not have permission")
+            return
+
+        # Stop the game instance
+        subprocess.call(["docker", "stop", "valheim"])
+
+        # Update the game
+        subprocess.call(["steamcmd", "+login", "anonymous", "+app_update", "896660", "validate", "+quit"])
+
+        # Start the game again
+        subprocess.call(["docker", "start", "valheim"])
+
+        msg = """ The server is hopefully booting
+        If it has not started after 1 minute contact @zaddmc
+        """
+        await intr.response.send_message(msg)
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Minecraft(bot), guilds=get_guilds())
