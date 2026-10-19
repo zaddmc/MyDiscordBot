@@ -102,6 +102,8 @@ class Minecraft(commands.Cog):
             await intr.response.send_message("You do not have permission")
             return
 
+        await intr.response.defer()
+
         # Stop the game instance
         subprocess.call(["docker", "stop", "valheim"])
 
@@ -114,7 +116,7 @@ class Minecraft(commands.Cog):
         msg = """ The server is hopefully booting
         If it has not started after 1 minute contact @zaddmc
         """
-        await intr.response.send_message(msg)
+        await intr.followup.send(msg)
 
 
 async def setup(bot: commands.Bot):
